@@ -1,4 +1,4 @@
-# AI Proffesional Resume/Cover Letter Builder
+# AI Profesional Resume/Cover Letter Builder
 
 ## Project title and team name
 
