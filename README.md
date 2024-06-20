@@ -37,7 +37,7 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
 - Users can log in and authentication will be done using OAuth 2.0 through Google accounts.
 
-- The application will make use of a Postgres database hosted on AWS.
+- The application will make use of a Postgres database hosted on Google Cloud.
 
 ## Bullet points outlining how to fulfil "Additional Requirements"
 
