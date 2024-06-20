@@ -63,7 +63,6 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 - Website is reponsive to mobile devices
 - Users can click a button next to each job posting to easily create a cover letter or resume for that job
 - Resumes and Cover Letters are uploaded to Google Drive after creation
-- Users can create job alerts that will send periodic emails to them with relevant jobs
 
 ### Final version
 
@@ -71,4 +70,5 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 - Users can choose between multiple generated resumes/cover letters
 - Users can choose between multiple formats for resumes and cover letter
 - Final stylistic updates are made to make the website look nice
+- Users can create job alerts that will send periodic emails to them with relevant jobs
 - Website is deployed
