@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import session from "express-session";
 import "dotenv/config";
 import { usersRouter } from "./routers/users_router.js";
+import cors from "cors";
 
 const PORT = 3000;
 export const app = express();
@@ -16,6 +17,11 @@ app.use(
   })
 );
 app.use(express.static("static"));
+const corsOptions = {
+  origin: "http://localhost:4200",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 try {
   await sequelize.authenticate();
   await sequelize.sync({ alter: { drop: false } });
