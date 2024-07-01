@@ -19,7 +19,7 @@ export class AuthWrapperComponent {
 
   signOut() {
     this.cookieService.delete('bearerToken');
-    this.router.navigate(['']);
+    this.router.navigate([''], { queryParams: { signOut: 'true' }} );
   }
 
   ngOnInit() {
