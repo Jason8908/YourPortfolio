@@ -7,8 +7,15 @@ export const User = sequelize.define("User", {
     allowNull: false,
     unique: true,
   },
-  password: {
+  fname: {
     type: DataTypes.STRING,
     allowNull: false,
-  }
+  },
+  lname: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+}, {
+  quoteIdentifiers: false,
+  tableName: "users",
 });

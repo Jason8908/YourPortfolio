@@ -6,6 +6,8 @@ import {
   GoogleInitOptions,
 } from '@abacritt/angularx-social-login';
 import { routes } from './app.routes';
+import { provideHttpClient } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
 
 const googleLoginOptions: GoogleInitOptions = {
   scopes: [
@@ -38,5 +40,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     googleProvider,
+    provideHttpClient(),
+    CookieService
   ],
 };
