@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
-import { SocialUser, SocialAuthService } from '@abacritt/angularx-social-login';
+import { ApiService } from '../../services/api.service';
+import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-wrapper',
@@ -9,11 +11,22 @@ import { SocialUser, SocialAuthService } from '@abacritt/angularx-social-login';
   styleUrl: './auth-wrapper.component.css',
 })
 export class AuthWrapperComponent {
-  constructor(private authService: SocialAuthService) {}
+  constructor(private apiService: ApiService, private cookieService: CookieService, private router: Router) {}
+
+  getBearerToken() {
+    return this.cookieService.get('bearerToken');
+  }
+
+  signOut() {
+    this.cookieService.delete('bearerToken');
+    this.router.navigate(['']);
+  }
 
   ngOnInit() {
-    this.authService.authState.subscribe((user) => {
-      console.log(user);
-    });
+    const token = this.getBearerToken();
+    // If no token in cookies, then navigate to the home page.
+    if (!token) {
+      this.router.navigate(['']);
+    }
   }
 }
