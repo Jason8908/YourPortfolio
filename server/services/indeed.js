@@ -86,10 +86,10 @@ function parseIndeedOutput(externalId, jsonResponse) {
         const location = jobInfo.location.formatted.long;
         const addresss = jsonResponse.body.commuteInfoModel?.companyLocation ?? jobInfo.location.streetAddress
         const employer = jsonResponse.body.jobInfoWrapperModel.jobInfoModel.jobInfoHeaderModel.companyName;
-        const benefits = jsonResponse.body.benefitsModel?.benefits?.map(benefit => benefit.label)?.join(",");
-        const jobTypes = jobInfo.jobTypes?.map(job => job.label)?.join(",");
+        const benefits = jsonResponse.body.benefitsModel?.benefits?.map(benefit => benefit.label);
+        const jobTypes = jobInfo.jobTypes?.map(job => job.label);
         const link = jsonResponse.body.jobMetadataFooterModel.originalJobLink?.href ?? `https://ca.indeed.com/viewjob?jk=${externalId}`;
-        const attributes = jobInfo.attributes.map(a => a.label)?.join(",");
+        const attributes = jobInfo.attributes.map(a => a.label);
 
         return {
             externalId,

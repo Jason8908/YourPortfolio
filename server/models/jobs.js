@@ -30,10 +30,26 @@ export const Job = sequelize.define("Job", {
     benefits: {
         type: DataTypes.TEXT,
         allowNull: true,
+        get() {
+            let val = this.getDataValue('benefits')?.split(',')
+            if (val?.length == 1 && val[0] == "") return []
+            return val
+        },
+        set(val) {
+            this.setDataValue('benefits', val?.join(','));
+        },
     },
     jobTypes: {
         type: DataTypes.TEXT,
         allowNull: true,
+        get() {
+            let val = this.getDataValue('jobTypes')?.split(',')
+            if (val?.length == 1 && val[0] == "") return []
+            return val
+        },
+        set(val) {
+            this.setDataValue('jobTypes', val?.join(','));
+        },
     },
     link: {
         type: DataTypes.TEXT,
@@ -42,6 +58,14 @@ export const Job = sequelize.define("Job", {
     attributes: {
         type: DataTypes.TEXT,
         allowNull: true,
+        get() {
+            let val = this.getDataValue('attributes')?.split(',')
+            if (val?.length == 1 && val[0] == "") return []
+            return val
+        },
+        set(val) {
+            this.setDataValue('attributes', val?.join(','));
+        },
     }
 
 }, {

@@ -12,12 +12,17 @@ export class ApiService {
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
-  sendAuth(token: string, firstName: string, lastName: string, email: string): Observable<any> {
+  sendAuth(
+    token: string,
+    firstName: string,
+    lastName: string,
+    email: string
+  ): Observable<any> {
     return this.http.post(`${this.endpoint}/api/users/auth`, {
       accessToken: token,
       firstName,
       lastName,
-      email
+      email,
     });
   }
 
@@ -26,6 +31,16 @@ export class ApiService {
     return this.http.get(`${this.endpoint}/api/users/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  getJobs(query: string, location: string, page: number = 0): Observable<any> {
+    return this.http.get(`${this.endpoint}/api/jobs/search`, {
+      params: {
+        query,
+        location,
+        page,
       },
     });
   }

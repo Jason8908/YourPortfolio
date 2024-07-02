@@ -11,8 +11,8 @@ export const jobsRouter = Router();
 jobsRouter.get("/search", async (req, res) => {
 
     let ids = await getIndeedJobsIds({
-        jobQuery: req.query.q,
-        jobLocation: req.query.l,
+        jobQuery: req.query.query,
+        jobLocation: req.query.location,
         page: req.query.page
     })
 
@@ -29,8 +29,6 @@ jobsRouter.get("/search", async (req, res) => {
     })
 
     let foundJobIds = jobs.map(job => job.externalId)
-
-    console.log(ids)
 
     let jobsToFind = ids.filter(id => !foundJobIds.includes(id))
 

@@ -1,0 +1,10 @@
+<app-auth-wrapper> </app-auth-wrapper>
+<div>
+  <app-job-preview *ngFor="let jobData of jobSearchResult" [jobData]="jobData">
+  </app-job-preview>
+</div>
+<!-- <div>
+  <div *ngFor="let jobData of jobSearchResult">
+    {{ jobData.title }}
+  </div>
+</div> -->
