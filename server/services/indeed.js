@@ -10,7 +10,7 @@ function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
     const encodedLocation = encodeURIComponent(jobLocation)
     const pageParam = page ? `&start=${page * 10}` : ''
 
-    return fetch(`https://ca.indeed.com/jobs?q=${encodedQuery}&l=${encodedLocation}${pageParam}`, {
+    return fetch(`https://ca.indeed.com/jobs?from=searchOnHP&q=${encodedQuery}&l=${encodedLocation}${pageParam}`, {
         "headers": {
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
             "accept-language": "en-US,en;q=0.9",
@@ -80,18 +80,18 @@ function getIndeedJobs({ jobQuery, jobLocation, page }) {
 }
 
 
-// const jobQuery = "Software Engineer";
-// const jobLocation = "Scarborough, ON";
-// const page = 0
+const jobQuery = "Software Engineer";
+const jobLocation = "Scarborough, ON";
+const page = 0
 
 
-// getIndeedJobs({ jobQuery, jobLocation, page }).then((res) => {
-//     console.log(typeof res)
-//     fs.writeFile('final.json', JSON.stringify(res), (err) => {
+getIndeedJobs({ jobQuery, jobLocation, page }).then((res) => {
+    console.log(typeof res)
+    fs.writeFile('final.json', JSON.stringify(res), (err) => {
 
-//         // In case of a error throw err.
-//         if (err) throw err;
-//     })
-// })
+        // In case of a error throw err.
+        if (err) throw err;
+    })
+})
 
 export { getIndeedJobs }
