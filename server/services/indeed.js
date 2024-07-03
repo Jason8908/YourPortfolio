@@ -1,38 +1,41 @@
 import fetch from 'node-fetch';
 import fs from 'fs'
+import puppeteer from 'puppeteer';
 
 const REQUEST_DELAY = 600
 
 
-function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
-    const encodedQuery = encodeURIComponent(jobQuery)
-    const encodedLocation = encodeURIComponent(jobLocation)
-    const pageParam = page ? `&start=${page * 10}` : ''
+async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
+    try {
 
-    return fetch(`https://ca.indeed.com/jobs?from=searchOnHP&q=${encodedQuery}&l=${encodedLocation}${pageParam}&spa=1`, {
-        "headers": {
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-            "accept-language": "en-US,en;q=0.9",
-            "cache-control": "max-age=0",
-            "priority": "u=0, i",
-            "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "none",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1"
-        },
-        "referrerPolicy": "strict-origin-when-cross-origin",
-        "body": null,
-        "method": "GET",
-        "mode": "cors",
-        "credentials": "include"
-    })
-        .then(res => res.json())
-        .then(res => Object.keys(res.body.jobKeysWithTwoPaneEligibility)) //ugly but it works
-        .catch(() => null)
+        const encodedQuery = encodeURIComponent(jobQuery)
+        const encodedLocation = encodeURIComponent(jobLocation)
+        const pageParam = page ? `&start=${page * 10}` : ''
+
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            defaultViewport: {
+                width: 1280,
+                height: 800
+            }
+        });
+        const browserPage = await browser.newPage();
+        await browserPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+        await browserPage.goto(`https://ca.indeed.com/jobs?from=searchOnHP&q=${encodedQuery}&l=${encodedLocation}${pageParam}&spa=1`);
+        await browserPage.waitForSelector('pre', { timeout: 2_000 });
+
+        const innerText = await browserPage.evaluate(() => {
+            return JSON.parse(document.querySelector("body").innerText);
+        });
+        browser.close()
+
+        return Object.keys(innerText.body.jobKeysWithTwoPaneEligibility)
+    }
+    catch {
+        browser.close()
+    }
 }
 
 function getIndeedJobFromId({ id }) {
@@ -55,11 +58,10 @@ function getIndeedJobFromId({ id }) {
     })
         .then(res => {
             if (res.status != 200) {
-                return Promise.reject(new Error('Too many requests'));
+                return null;
             }
-            return (res.json());
+            return (res.json().then(res => parseIndeedOutput(id, res)));
         })
-        .then(res => parseIndeedOutput(id, res))
 }
 
 function getIndeedJobs({ ids }) {
@@ -89,7 +91,8 @@ function parseIndeedOutput(externalId, jsonResponse) {
         const benefits = jsonResponse.body.benefitsModel?.benefits?.map(benefit => benefit.label);
         const jobTypes = jobInfo.jobTypes?.map(job => job.label);
         const link = jsonResponse.body.jobMetadataFooterModel.originalJobLink?.href ?? `https://ca.indeed.com/viewjob?jk=${externalId}`;
-        const attributes = jobInfo.attributes.map(a => a.label);
+        //const attributes = jobInfo.attributes.map(a => a.label);
+        const attributes = jsonResponse.body.mosasicData.provider["js-match-insights-provider"].initialData.attributes.map(a => a.label)
 
         return {
             externalId,

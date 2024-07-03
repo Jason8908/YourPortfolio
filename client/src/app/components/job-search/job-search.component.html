@@ -1,0 +1,13 @@
+<form [formGroup]="jobSearch" (submit)="search()">
+    <div class="form-fields">
+        <mat-form-field>
+            <mat-label>Job Query</mat-label>
+            <input matInput formControlName="query">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Location</mat-label>
+            <input matInput formControlName="location">
+        </mat-form-field>
+        <button mat-flat-button type="submit">Search</button>
+    </div>
+</form>

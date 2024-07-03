@@ -1,5 +1,5 @@
 import { Router } from "express";
-// import { isAuthenticated } from "../middleware/auth";
+import { isAuthenticated } from "../middleware/auth.js";
 import { getIndeedJobs, getIndeedJobsIds } from "../services/indeed.js";
 import { Job } from "../models/jobs.js";
 import { Op } from 'sequelize';
@@ -33,7 +33,7 @@ jobsRouter.get("/search", async (req, res) => {
     let jobsToFind = ids.filter(id => !foundJobIds.includes(id))
 
     let newJobs = (await getIndeedJobs({ ids: jobsToFind }))
-        .filter(res => !res.value.error) //comment out to find edge cases with data retrieval
+        .filter(res => res.value && !res.value.error) //comment out to find edge cases with data retrieval
         .map(res => res.value)
 
     try {

@@ -42,6 +42,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     googleProvider,
     provideHttpClient(),
-    CookieService, provideAnimationsAsync()
+    CookieService, provideAnimationsAsync(), provideAnimationsAsync()
   ],
 };

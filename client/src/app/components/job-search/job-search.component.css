@@ -1,0 +1,6 @@
+.form-fields{
+    display: flex;
+    /* align-content: center;
+    align-items: center; */
+    gap: 10px;
+}

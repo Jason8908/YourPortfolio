@@ -36,11 +36,15 @@ export class ApiService {
   }
 
   getJobs(query: string, location: string, page: number = 0): Observable<any> {
+    const token = this.cookieService.get('bearerToken');
     return this.http.get(`${this.endpoint}/api/jobs/search`, {
       params: {
         query,
         location,
         page,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
   }

@@ -4,7 +4,7 @@ import {
   GoogleSigninButtonModule,
 } from '@abacritt/angularx-social-login';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthWrapperComponent } from "../../components/auth-wrapper/auth-wrapper.component";
+import { AuthHeaderComponent } from "../../components/auth-header/auth-header.component";
 import { GoogleLoginProvider } from "@abacritt/angularx-social-login";
 import { ApiService } from '../../services/api.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -16,7 +16,7 @@ import { CookieService } from 'ngx-cookie-service';
     styleUrls: [
       './home.component.css'
     ],
-    imports: [GoogleSigninButtonModule, AuthWrapperComponent]
+    imports: [GoogleSigninButtonModule, AuthHeaderComponent]
 })
 export class HomeComponent {
   signOut: boolean = false;
