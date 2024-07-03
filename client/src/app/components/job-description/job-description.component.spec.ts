@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AuthWrapperComponent } from './auth-wrapper.component';
+import { JobDescriptionComponent } from './job-description.component';
 
-describe('AuthWrapperComponent', () => {
-  let component: AuthWrapperComponent;
-  let fixture: ComponentFixture<AuthWrapperComponent>;
+describe('JobDescriptionComponent', () => {
+  let component: JobDescriptionComponent;
+  let fixture: ComponentFixture<JobDescriptionComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AuthWrapperComponent]
+      imports: [JobDescriptionComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AuthWrapperComponent);
+    fixture = TestBed.createComponent(JobDescriptionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

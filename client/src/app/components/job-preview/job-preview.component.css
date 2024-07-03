@@ -1,0 +1,13 @@
+.example-card {
+    margin: 10px 10px;
+    transition: 0.3s;
+}
+
+.example-card:hover {
+    margin: 10px 10px;
+    background-color: #dadada;
+}
+
+.example-card-footer {
+    padding: 16px;
+}
