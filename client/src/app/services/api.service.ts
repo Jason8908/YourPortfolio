@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
+import { JobSearchRequest } from '../models/jobSearch';
 
 @Injectable({
   providedIn: 'root',
@@ -35,14 +36,10 @@ export class ApiService {
     });
   }
 
-  getJobs(query: string, location: string, page: number = 0): Observable<any> {
+  getJobs(jobSearchRequest: JobSearchRequest): Observable<any> {
     const token = this.cookieService.get('bearerToken');
     return this.http.get(`${this.endpoint}/api/jobs/search`, {
-      params: {
-        query,
-        location,
-        page,
-      },
+      params: { ...jobSearchRequest },
       headers: {
         Authorization: `Bearer ${token}`,
       },

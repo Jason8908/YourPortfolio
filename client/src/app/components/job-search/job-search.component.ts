@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -8,6 +8,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
+import { JobSearchRequest } from '../../models/jobSearch';
 
 @Component({
   selector: 'app-job-search',
@@ -23,6 +24,8 @@ import { MatButton } from '@angular/material/button';
   styleUrl: './job-search.component.css',
 })
 export class JobSearchComponent {
+  @Output() newSearch = new EventEmitter<JobSearchRequest>();
+
   jobSearch: FormGroup;
   constructor(private fb: FormBuilder) {
     this.jobSearch = this.fb.group({
@@ -31,5 +34,10 @@ export class JobSearchComponent {
     });
   }
 
-  search() {}
+  search() {
+    this.newSearch.emit({
+      query: this.jobSearch.value.query,
+      location: this.jobSearch.value.location,
+    });
+  }
 }

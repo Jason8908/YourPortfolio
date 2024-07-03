@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Job } from '../../models/response';
 
 @Component({
   selector: 'app-job-description',
@@ -13,7 +12,7 @@ import { Job } from '../../models/response';
   styleUrl: './job-description.component.css',
 })
 export class JobDescriptionComponent {
-  @Input({ required: true }) jobData: Job = {
+  @Input({ required: true }) jobData: any = {
     id: 0,
     externalId: '',
     title: '',
