@@ -1,3 +1,5 @@
-<app-auth-wrapper>
-    <p>dashboard works!</p>
-</app-auth-wrapper>
+<app-auth-header></app-auth-header>
+<p>Welcome, {{user.firstName}} {{user.lastName}}</p>
+<nav>
+    <a routerLink="/dashboard/jobs">View Jobs</a>
+</nav>
