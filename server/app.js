@@ -1,6 +1,7 @@
 import { sequelize } from "./datasource.js";
 import express from "express";
 import { usersRouter } from "./routers/users_router.js";
+import { skillsRouter } from "./routers/skills_router.js";
 import cors from "cors";
 import { jobsRouter } from "./routers/jobs_router.js";
 
@@ -22,9 +23,9 @@ try {
   console.error("Unable to connect to the database:", error);
 }
 
-app.use("/api/users", usersRouter)
-app.use("/api/jobs", jobsRouter)
-
+app.use("/api/users", usersRouter);
+app.use("/api/jobs", jobsRouter);
+app.use("/api/skills", skillsRouter);
 
 app.listen(PORT, (err) => {
   if (err) console.log(err);

@@ -1,4 +1,6 @@
 import { User } from "../models/users.js";
+import { UserSkill } from "../models/userSkills.js";
+import { Skill } from "../models/skills.js";
 import { Session } from "../models/sessions.js";
 import { Router } from "express";
 import { ApiResponse } from "../entities/response.js";
@@ -11,6 +13,11 @@ export const usersRouter = Router();
 const googleAPI = axios.create({
   baseURL: process.env.GOOGLE_API_URL
 });
+
+const operations = {
+  Add: "add",
+  Remove: "remove"
+}
 
 // Private function to decode a JWT.
 const getTokenInfo = async (token) => {
@@ -28,6 +35,12 @@ const getTokenInfo = async (token) => {
 // Create a cryptographically secure random bearer token
 const generateBearerToken = () => {
   return randomBytes(32).toString('hex');
+}
+
+const getAllSkillsByUserId = async (userId) => {
+  return await UserSkill.findAll({
+    where: { userId }
+  });
 }
 
 usersRouter.get("/me", isAuthenticated, setUserId, async (req, res) => {
@@ -75,4 +88,70 @@ usersRouter.post("/auth", async (req, res) => {
     tokenType: "Bearer",
     accessToken: session.id,
   }));
+});
+
+const bulkDeleteUserSkills = async (userId, skills) => {
+  const skillIds = skills.map(skill => skill.id);
+  return await UserSkill.destroy({
+    where: {
+      userId,
+      skillId: skillIds
+    }
+  });
+}
+
+const bulkAddUserSkills = async (userId, skills) => {
+  const userSkills = skills.map(skill => ({ userId, skillId: skill.id }));
+  return await UserSkill.bulkCreate(userSkills);
+}
+
+const bulkCreateAddUserSkills = async (userId, skills) => {
+  const toCreate = skills.map(skill => ({ skillName: skill.name }));
+  const createdSkills = await Skill.bulkCreate(toCreate, { returning: true });
+  const toInsert = createdSkills.map(skill => ({ userId, skillId: skill.id }));
+  return await UserSkill.bulkCreate(toInsert);
+};
+
+// User skills
+usersRouter.get("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
+});
+
+usersRouter.put("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
+  const skills = req.body.skills;
+  const userId = +req.params.id;
+  let toDelete = [], toAdd = [], toCreate = [];
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res.status(403).json(new ApiResponse(403, "Forbidden: You can only update your own skills."));
+  // Running validations on skills
+  if (!skills)
+    return res.status(400).json(new ApiResponse(400, "Missing information: Must provide a list of skills."));
+  if (!Array.isArray(skills))
+    return res.status(400).json(new ApiResponse(400, "Invalid information: skills must be an array."));
+  // Check if all operations are either 'add' or 'remove'
+  for (const skill of skills) {
+    if (skill.operation !==  operations.Add && skill.operation !== operations.Remove)
+      return res.status(400).json(new ApiResponse(400, "Invalid information: operation must be either 'add' or 'remove' for all skills."));
+    if (skill.operation === operations.Add)
+      if (skill.id === undefined)
+        toCreate.push(skill);
+      else
+        toAdd.push(skill);
+    else
+      toDelete.push(skill);
+  }
+  try {
+    await bulkDeleteUserSkills(userId, toDelete);
+    await bulkAddUserSkills(userId, toAdd);
+    await bulkCreateAddUserSkills(userId, toCreate);
+    const status = toAdd.length > 0 ? 201 : 200;
+    return res.status(status).json(new ApiResponse(status, "Skills updated successfully."));
+  }
+  catch(error) {
+    return res.status(500).json(new ApiResponse(500, "Internal server error.", error.message));
+  }
 });

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthHeaderComponent } from '../../components/auth-header/auth-header.component';
+import { AuthWrapperComponent } from '../../components/auth-wrapper/auth-wrapper.component';
+import { UserSkillsComponent } from '../../components/user-skills/user-skills.component';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../../services/api.service';
 import { Router, RouterModule } from '@angular/router';
@@ -8,7 +9,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [AuthHeaderComponent, RouterModule],
+  imports: [AuthWrapperComponent, UserSkillsComponent, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
