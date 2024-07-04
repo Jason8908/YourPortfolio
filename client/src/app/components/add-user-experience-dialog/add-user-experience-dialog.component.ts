@@ -10,9 +10,16 @@ import { MatGridListModule } from '@angular/material/grid-list';
 @Component({
   selector: 'app-add-user-experience-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatInputModule, FormsModule, MatButtonModule, MatDatepickerModule, MatGridListModule],
+  imports: [
+    MatDialogModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatGridListModule,
+  ],
   templateUrl: './add-user-experience-dialog.component.html',
-  styleUrl: './add-user-experience-dialog.component.css'
+  styleUrl: './add-user-experience-dialog.component.css',
 })
 export class AddUserExperienceDialogComponent {
   exp: UserExperience = {} as UserExperience;

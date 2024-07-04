@@ -8,7 +8,12 @@ import { UserExperiencesComponent } from '../../components/user-experiences/user
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [UserSkillsComponent, AuthHeaderComponent, UserInterestsComponent, UserExperiencesComponent],
+  imports: [
+    UserSkillsComponent,
+    AuthHeaderComponent,
+    UserInterestsComponent,
+    UserExperiencesComponent,
+  ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
 })

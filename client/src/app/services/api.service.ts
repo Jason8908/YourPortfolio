@@ -198,13 +198,13 @@ export class ApiService {
         position: experience.position,
         startDate: experience.startDate,
         endDate: experience.endDate,
-        description: experience.description
+        description: experience.description,
       },
       {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
-      }
+        },
+      },
     ) as Observable<ApiResponse>;
   }
 }

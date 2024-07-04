@@ -7,7 +7,9 @@
   <mat-list role="list">
     <mat-list-item role="listitem" *ngFor="let interest of interests">
       <span>{{ interest.interest }}</span>
-      <mat-icon matListItemIcon (click)="deleteInterest(interest.id)">close</mat-icon>
+      <mat-icon matListItemIcon (click)="deleteInterest(interest.id)"
+        >close</mat-icon
+      >
     </mat-list-item>
   </mat-list>
 </div>

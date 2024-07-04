@@ -2,31 +2,31 @@ import { sequelize } from "../datasource.js";
 import { DataTypes } from "sequelize";
 import { User } from "./users.js";
 
-export const UserExperience = sequelize.define('UserExperience', {
+export const UserExperience = sequelize.define("UserExperience", {
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
   company: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
   position: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
   startDate: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
   },
   endDate: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
   },
   description: {
     type: DataTypes.STRING,
-    allowNull: true
-  }
+    allowNull: true,
+  },
 });
 
 User.hasMany(UserExperience);

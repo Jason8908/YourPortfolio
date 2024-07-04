@@ -8,9 +8,8 @@ describe('AddUserExperienceDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddUserExperienceDialogComponent]
-    })
-    .compileComponents();
+      imports: [AddUserExperienceDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AddUserExperienceDialogComponent);
     component = fixture.componentInstance;

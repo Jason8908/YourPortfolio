@@ -8,9 +8,8 @@ describe('AddInterestDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddInterestDialogComponent]
-    })
-    .compileComponents();
+      imports: [AddInterestDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AddInterestDialogComponent);
     component = fixture.componentInstance;
