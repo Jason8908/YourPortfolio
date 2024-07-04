@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Add an Interest</h2>
+<mat-dialog-content class="mat-typography">
+  <mat-form-field>
+    <mat-label>Interest</mat-label>
+    <input matInput [(ngModel)]="interestInput" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="null">Cancel</button>
+  <button
+    mat-button
+    [mat-dialog-close]="interestInput"
+    [disabled]="!interestInput || interestInput.length < 1"
+  >
+    Confirm
+  </button>
+</mat-dialog-actions>

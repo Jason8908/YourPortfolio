@@ -2,10 +2,12 @@ import { User } from "../models/users.js";
 import { UserSkill } from "../models/userSkills.js";
 import { Skill } from "../models/skills.js";
 import { Session } from "../models/sessions.js";
+import { UserInterest } from "../models/userinterests.js";
 import { Router } from "express";
 import { ApiResponse } from "../entities/response.js";
 import { randomBytes } from "crypto";
 import { isAuthenticated, setUserId } from "../middleware/auth.js";
+import { UserExperience } from "../models/userexperiences.js";
 import { Op } from "sequelize";
 import "dotenv/config";
 import axios from "axios";
@@ -338,3 +340,215 @@ usersRouter.post(
     res.status(201).json(new ApiResponse(201, "Skill added successfully."));
   },
 );
+
+// USER INTERESTS
+
+usersRouter.get("/:id/interests", isAuthenticated, setUserId, async (req, res) => {
+  const limit = req.query.limit || 10;
+  const offset = req.query.offset || 0;
+  const userId = +req.params.id;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res
+      .status(403)
+      .json(
+        new ApiResponse(403, "Forbidden: You can only view your own interests."),
+      );
+  // Get the user's interests
+  const results = await UserInterest.findAndCountAll({
+    limit: limit,
+    offset: offset,
+    order: [["interest", "ASC"]],
+  });
+  const totalCount = results.count;
+  const interests = results.rows;
+  res.status(200).json(new ApiResponse(200, "", { totalCount, interests }));
+});
+
+usersRouter.post("/:id/interests", isAuthenticated, setUserId, async (req, res) => {
+  const userId = +req.params.id;
+  const interest = req.body.interest;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res
+      .status(403)
+      .json(
+        new ApiResponse(403, "Forbidden: You can only update your own interests."),
+      );
+  // Verify the interest is provided
+  if (!interest)
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "Missing information: Must provide an interest."),
+      );
+  // Create the user interest
+  await UserInterest.create({ userId, interest });
+  res.status(201).json(new ApiResponse(201, "Interest added successfully."));
+});
+
+usersRouter.delete("/:id/interests/:interestId", isAuthenticated, setUserId, async (req, res) => {
+  const userId = +req.params.id;
+  const interestId = req.params.interestId;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res
+      .status(403)
+      .json(
+        new ApiResponse(403, "Forbidden: You can only update your own interests."),
+      );
+  // Verify the interestId is provided
+  if (!interestId)
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(400, "Missing information: Must provide an interest."),
+      );
+  // Verify the interest exists
+  const userInterest = await UserInterest.findOne({
+    where: {
+      userId,
+      id: interestId,
+    },
+  });
+  if (!userInterest)
+    return res
+      .status(404)
+      .json(new ApiResponse(404, "User does not have the specified interest."));
+  // Delete the user interest
+  await userInterest.destroy();
+  res.status(200).json(new ApiResponse(200, "Interest removed successfully."));
+});
+
+// USER EXPERIENCES
+
+usersRouter.get("/:id/experiences", isAuthenticated, setUserId, async (req, res) => {
+  const limit = req.query.limit || 10;
+  const offset = req.query.offset || 0;
+  const userId = +req.params.id;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res
+      .status(403)
+      .json(
+        new ApiResponse(
+          403,
+          "Forbidden: You can only view your own experiences.",
+        ),
+      );
+  // Get the user's experiences
+  const results = await UserExperience.findAndCountAll({
+    where: { userId },
+    limit: limit,
+    offset: offset,
+    order: [["startDate", "DESC"]],
+  });
+  const totalCount = results.count;
+  const experiences = results.rows.map((experience) => ({
+    id: experience.id,
+    company: experience.company,
+    position: experience.position,
+    startDate: experience.startDate,
+    endDate: experience.endDate,
+    description: experience.description,
+  }));
+  res.status(200).json(new ApiResponse(200, "", { totalCount, experiences }));
+});
+
+usersRouter.post("/:id/experiences", isAuthenticated, setUserId, async (req, res) => {
+  const userId = +req.params.id;
+  const { company, position, startDate, endDate, description } = req.body;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res
+      .status(403)
+      .json(
+        new ApiResponse(
+          403,
+          "Forbidden: You can only update your own experiences.",
+        ),
+      );
+  // Verify the required information is provided
+  if (!company || !position || !startDate)
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          "Missing information: Must provide a company, position, and start date.",
+        ),
+      );
+  // Create the user experience
+  await UserExperience.create({
+    userId,
+    company,
+    position,
+    startDate,
+    endDate,
+    description,
+  });
+  res.status(201).json(new ApiResponse(201, "Experience added successfully."));
+});
+
+usersRouter.delete("/:id/experiences/:experienceId", isAuthenticated, setUserId, async (req, res) => {
+  const userId = +req.params.id;
+  const experienceId = req.params.experienceId;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res
+      .status(403)
+      .json(
+        new ApiResponse(
+          403,
+          "Forbidden: You can only update your own experiences.",
+        ),
+      );
+  // Verify the experienceId is provided
+  if (!experienceId)
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          "Missing information: Must provide an experience.",
+        ),
+      );
+  // Verify the experience exists
+  const userExperience = await UserExperience.findOne({
+    where: {
+      userId,
+      id: experienceId,
+    },
+  });
+  if (!userExperience)
+    return res
+      .status(404)
+      .json(new ApiResponse(404, "User does not have the specified experience."));
+  // Delete the user experience
+  await userExperience.destroy();
+  res.status(200).json(new ApiResponse(200, "Experience removed successfully."));
+});

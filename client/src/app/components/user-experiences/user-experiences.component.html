@@ -1,0 +1,19 @@
+<div class="experiences-wrapper">
+  <h3>Work/Volunteer Experience</h3>
+  <button mat-fab extended (click)="addExperience()">
+    <mat-icon>work</mat-icon>
+    Add an Experience
+  </button>
+  <div class="user-experiences">
+    <mat-accordion>
+      <mat-expansion-panel hideToggle *ngFor="let exp of experiences">
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{exp.position}} &#64; {{exp.company}} </mat-panel-title>
+          <mat-panel-description> {{formatDate(exp.startDate)}} &#8212; {{exp.endDate ? formatDate(exp.endDate) : "Present"}}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>{{exp.description || ""}}</p>
+        <button mat-flat-button class="delete-btn" (click)="deleteExperience(exp.id)">Delete</button>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

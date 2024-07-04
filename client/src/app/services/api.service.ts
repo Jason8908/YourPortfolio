@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { JobSearchRequest } from '../models/jobSearch';
 import { ApiResponse } from '../classes/response';
 import { CookieLabels } from '../app.constants';
+import { UserExperience } from '../classes/experiences';
+import { pipe } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -111,5 +113,98 @@ export class ApiService {
         Authorization: `Bearer ${token}`,
       },
     }) as Observable<ApiResponse>;
+  }
+
+  getUserInterests(
+    userId: Number,
+    offset = 0,
+    limit = 10,
+  ): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.get(`${this.endpoint}/api/users/${userId}/interests`, {
+      params: { offset, limit },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }) as Observable<ApiResponse>;
+  }
+
+  deleteUserInterest(
+    userId: Number,
+    interestId: Number,
+  ): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.delete(
+      `${this.endpoint}/api/users/${userId}/interests/${interestId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ) as Observable<ApiResponse>;
+  }
+
+  addUserInterest(userId: Number, interest: Number): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.post(
+      `${this.endpoint}/api/users/${userId}/interests`,
+      { interest },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ) as Observable<ApiResponse>;
+  }
+
+  getUserExperiences(
+    userId: Number,
+    offset = 0,
+    limit = 5,
+  ): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.get(`${this.endpoint}/api/users/${userId}/experiences`, {
+      params: { offset, limit },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }) as Observable<ApiResponse>;
+  }
+
+  deleteUserExperience(
+    userId: Number,
+    experienceId: Number,
+  ): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.delete(
+      `${this.endpoint}/api/users/${userId}/experiences/${experienceId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ) as Observable<ApiResponse>;
+  }
+
+  addUserExperience(
+    userId: Number,
+    experience: UserExperience,
+  ): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.post(
+      `${this.endpoint}/api/users/${userId}/experiences`,
+      {
+        company: experience.company,
+        position: experience.position,
+        startDate: experience.startDate,
+        endDate: experience.endDate,
+        description: experience.description
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      }
+    ) as Observable<ApiResponse>;
   }
 }
