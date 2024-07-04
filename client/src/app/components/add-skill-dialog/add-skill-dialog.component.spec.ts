@@ -8,9 +8,8 @@ describe('AddSkillDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddSkillDialogComponent]
-    })
-    .compileComponents();
+      imports: [AddSkillDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AddSkillDialogComponent);
     component = fixture.componentInstance;

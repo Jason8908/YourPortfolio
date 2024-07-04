@@ -28,7 +28,7 @@ export class AuthHeaderComponent {
   constructor(
     private apiService: ApiService,
     private cookieService: CookieService,
-    private router: Router
+    private router: Router,
   ) {}
 
   getBearerToken() {
@@ -54,7 +54,7 @@ export class AuthHeaderComponent {
       (error) => {
         console.log(`Error with the API: ${JSON.stringify(error)}`);
         this.router.navigate([''], { queryParams: { signOut: 'true' } });
-      }
+      },
     );
   }
 }

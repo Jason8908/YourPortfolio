@@ -18,14 +18,14 @@ skillsRouter.get("/", isAuthenticated, async (req, res) => {
     limit: limit,
     offset: offset,
     order: [
-      [Sequelize.fn('LENGTH', Sequelize.col('skillName')), 'ASC'],
-      ['skillName', 'ASC']
-    ]
+      [Sequelize.fn("LENGTH", Sequelize.col("skillName")), "ASC"],
+      ["skillName", "ASC"],
+    ],
   });
   const totalCount = results.count;
-  const skills = results.rows.map(skill => ({
+  const skills = results.rows.map((skill) => ({
     id: skill.id,
-    name: skill.skillName
+    name: skill.skillName,
   }));
   res.status(200).json(new ApiResponse(200, "", { totalCount, skills }));
 });

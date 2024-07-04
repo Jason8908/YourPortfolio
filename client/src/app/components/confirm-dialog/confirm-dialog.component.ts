@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
-import {MatButtonModule} from '@angular/material/button';
-import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogData } from '../../classes/confirm-dialog-data';
 
 @Component({
@@ -8,11 +8,11 @@ import { ConfirmDialogData } from '../../classes/confirm-dialog-data';
   standalone: true,
   imports: [MatDialogModule, MatButtonModule],
   templateUrl: './confirm-dialog.component.html',
-  styleUrl: './confirm-dialog.component.css'
+  styleUrl: './confirm-dialog.component.css',
 })
 export class ConfirmDialogComponent {
   message: string;
   constructor(@Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData) {
-    this.message = data.message || "Are you sure you want to do this?";
+    this.message = data.message || 'Are you sure you want to do this?';
   }
 }

@@ -1,5 +1,5 @@
 import { Component, Inject, model, OnInit, inject } from '@angular/core';
-import {MatButtonModule} from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -13,8 +13,8 @@ import {
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ReactiveFormsModule, FormControl, FormsModule } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { Skill, SkillList } from '../../classes/skills';
 import { ApiService } from '../../services/api.service';
 import { Observable } from 'rxjs';
@@ -23,16 +23,25 @@ import { AddSkillDialogData } from '../../classes/add-skill-dialog-data';
 @Component({
   selector: 'app-add-skill-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule, FormsModule, MatAutocompleteModule, ReactiveFormsModule, AsyncPipe],
+  imports: [
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    AsyncPipe,
+  ],
   templateUrl: './add-skill-dialog.component.html',
-  styleUrl: './add-skill-dialog.component.css'
+  styleUrl: './add-skill-dialog.component.css',
 })
 export class AddSkillDialogComponent {
   // Time in milliseconds to wait between each API call to the backend
   apiCooldown = 350;
   canCall = true;
   timeoutFunction: any = null;
-  lastSearched = "";
+  lastSearched = '';
   // Form information
   skillInput: string | null = null;
   skillNameToId: { [key: string]: number } = {};
@@ -42,8 +51,7 @@ export class AddSkillDialogComponent {
   constructor(private apiService: ApiService) {}
 
   resetApiTimeout() {
-    if (!this.timeoutFunction)
-      return;
+    if (!this.timeoutFunction) return;
     clearTimeout(this.timeoutFunction);
     this.setApiTimeout();
   }
@@ -58,8 +66,7 @@ export class AddSkillDialogComponent {
   }
 
   updateSkillOptions(searchQuery: string | null) {
-    if (!searchQuery)
-      return this.setBlankSkillOptions()
+    if (!searchQuery) return this.setBlankSkillOptions();
     this.lastSearched = searchQuery;
     this.apiService.getSkills(searchQuery).subscribe((response) => {
       const result = response.data as SkillList;
@@ -77,8 +84,7 @@ export class AddSkillDialogComponent {
   }
 
   returnOption(): number | string | null {
-    if (!this.skillInput || this.skillInput.length < 1)
-      return null;
+    if (!this.skillInput || this.skillInput.length < 1) return null;
     // If skillInput is in the skillNameToId dictionary, then return the skill ID.
     if (this.skillNameToId[this.skillInput])
       return this.skillNameToId[this.skillInput];
@@ -89,10 +95,8 @@ export class AddSkillDialogComponent {
   ngOnInit() {
     this.control.valueChanges.subscribe((value) => {
       this.skillInput = value;
-      if (!value)
-        return this.setBlankSkillOptions();
-      if (!this.canCall)
-        return this.resetApiTimeout();
+      if (!value) return this.setBlankSkillOptions();
+      if (!this.canCall) return this.resetApiTimeout();
       this.canCall = false;
       this.setApiTimeout();
       this.updateSkillOptions(value);

@@ -1,21 +1,29 @@
 <h2 mat-dialog-title>Add a Skill</h2>
 <mat-dialog-content class="mat-typography">
-<mat-form-field>
-  <mat-label>Skill</mat-label>
-  <input type="text"
-    placeholder="Enter a Skill"
-    aria-label="Skill"
-    matInput
-    [formControl]="control"
-    [matAutocomplete]="auto">
-<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-  @for (option of skillOptions | async; track option) {
-    <mat-option [value]="option.name">{{option.name}}</mat-option>
-  }
-</mat-autocomplete>
-</mat-form-field>
+  <mat-form-field>
+    <mat-label>Skill</mat-label>
+    <input
+      type="text"
+      placeholder="Enter a Skill"
+      aria-label="Skill"
+      matInput
+      [formControl]="control"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      @for (option of skillOptions | async; track option) {
+        <mat-option [value]="option.name">{{ option.name }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button [mat-dialog-close]="null">Cancel</button>
-  <button mat-button [mat-dialog-close]="returnOption()" [disabled]="!skillInput || skillInput.length < 1">Confirm</button>
+  <button
+    mat-button
+    [mat-dialog-close]="returnOption()"
+    [disabled]="!skillInput || skillInput.length < 1"
+  >
+    Confirm
+  </button>
 </mat-dialog-actions>

@@ -25,7 +25,7 @@ const googleProvider = {
         id: GoogleLoginProvider.PROVIDER_ID,
         provider: new GoogleLoginProvider(
           '306926403104-fc62u100r760gct7de9hr3na6k83p0lj.apps.googleusercontent.com',
-          googleLoginOptions
+          googleLoginOptions,
         ),
       },
     ],
@@ -42,6 +42,6 @@ export const appConfig: ApplicationConfig = {
     googleProvider,
     provideHttpClient(),
     provideAnimationsAsync(),
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
   ],
 };

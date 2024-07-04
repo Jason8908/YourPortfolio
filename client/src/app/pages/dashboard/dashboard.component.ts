@@ -16,13 +16,12 @@ export class DashboardComponent {
   user: User = {} as User;
   constructor(
     private router: Router,
-    private localStorage: LocalStorageService
+    private localStorage: LocalStorageService,
   ) {}
 
   ngOnInit() {
     const user = this.localStorage.getUser();
-    if (!user)
-      this.router.navigate(['']);
+    if (!user) this.router.navigate(['']);
     this.user = user as User;
   }
 }

@@ -6,7 +6,7 @@
   </button>
   <mat-list role="list">
     <mat-list-item role="listitem" *ngFor="let skill of skills">
-      <span>{{skill.name}}</span>
+      <span>{{ skill.name }}</span>
       <mat-icon matListItemIcon (click)="deleteSkill(skill.id)">close</mat-icon>
     </mat-list-item>
   </mat-list>

@@ -5,19 +5,27 @@ export async function isAuthenticated(req, res, next) {
   // Check if the request has a Bearer access token in its authorization header.
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    return res.status(401).json(new ApiResponse(401, "Unauthorized. Missing authorization header."));
+    return res
+      .status(401)
+      .json(
+        new ApiResponse(401, "Unauthorized. Missing authorization header."),
+      );
   }
   // Extract the access token from the authorization header.
   const accessToken = authHeader.split(" ")[1];
   // Check if the access token exists in the database.
   const session = await Session.findByPk(accessToken);
   if (!session) {
-    return res.status(401).json(new ApiResponse(401, "Unauthorized. Invalid access token."));
+    return res
+      .status(401)
+      .json(new ApiResponse(401, "Unauthorized. Invalid access token."));
   }
   // If token is expired, remove it from the database and return 401.
   if (session.expiresAt < new Date()) {
     await session.destroy();
-    return res.status(401).json(new ApiResponse(401, "Unauthorized. Expired access token."));
+    return res
+      .status(401)
+      .json(new ApiResponse(401, "Unauthorized. Expired access token."));
   }
   next();
 }

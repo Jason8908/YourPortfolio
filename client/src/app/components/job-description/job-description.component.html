@@ -1,25 +1,24 @@
 <mat-card *ngIf="jobData" appearance="outlined" class="description-card">
-    <mat-card-header>
-        <mat-card-title>{{ jobData.title }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-header>
-        <div class="job-description" [innerHTML]="jobData.description">
-        </div>
-    </mat-card-header>
-    <mat-card-content>
-        <p>Benefits</p>
-    </mat-card-content>
-    <mat-chip-set>
-        <mat-chip *ngFor="let benefit of jobData.benefits">
-            {{ benefit }}
-        </mat-chip>
-    </mat-chip-set>
-    <mat-card-content>
-        <p>Associated attributes</p>
-    </mat-card-content>
-    <mat-chip-set>
-        <mat-chip *ngFor="let attribute of jobData.attributes">
-            {{ attribute }}
-        </mat-chip>
-    </mat-chip-set>
+  <mat-card-header>
+    <mat-card-title>{{ jobData.title }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-header>
+    <div class="job-description" [innerHTML]="jobData.description"></div>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Benefits</p>
+  </mat-card-content>
+  <mat-chip-set>
+    <mat-chip *ngFor="let benefit of jobData.benefits">
+      {{ benefit }}
+    </mat-chip>
+  </mat-chip-set>
+  <mat-card-content>
+    <p>Associated attributes</p>
+  </mat-card-content>
+  <mat-chip-set>
+    <mat-chip *ngFor="let attribute of jobData.attributes">
+      {{ attribute }}
+    </mat-chip>
+  </mat-chip-set>
 </mat-card>

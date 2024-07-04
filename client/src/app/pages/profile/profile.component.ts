@@ -8,7 +8,7 @@ import { ApiService } from '../../services/api.service';
   standalone: true,
   imports: [UserSkillsComponent, AuthHeaderComponent],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  styleUrl: './profile.component.css',
 })
 export class ProfileComponent {
   constructor(private apiService: ApiService) {}
