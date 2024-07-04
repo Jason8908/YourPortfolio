@@ -7,7 +7,6 @@ import {
 } from '@abacritt/angularx-social-login';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 const googleLoginOptions: GoogleInitOptions = {
@@ -20,7 +19,7 @@ const googleLoginOptions: GoogleInitOptions = {
 const googleProvider = {
   provide: 'SocialAuthServiceConfig',
   useValue: {
-    autoLogin: true,
+    autoLogin: false,
     providers: [
       {
         id: GoogleLoginProvider.PROVIDER_ID,
@@ -42,6 +41,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     googleProvider,
     provideHttpClient(),
-    CookieService, provideAnimationsAsync(), provideAnimationsAsync()
+    provideAnimationsAsync(),
+    provideAnimationsAsync()
   ],
 };

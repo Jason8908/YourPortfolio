@@ -1,0 +1,13 @@
+<div class="skills-wrapper">
+  <h3>Skills</h3>
+  <button mat-fab extended (click)="addSkill()">
+    <mat-icon>star</mat-icon>
+    Add a Skill
+  </button>
+  <mat-list role="list">
+    <mat-list-item role="listitem" *ngFor="let skill of skills">
+      <span>{{skill.name}}</span>
+      <mat-icon matListItemIcon (click)="deleteSkill(skill.id)">close</mat-icon>
+    </mat-list-item>
+  </mat-list>
+</div>

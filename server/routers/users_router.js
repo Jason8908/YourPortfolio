@@ -6,6 +6,7 @@ import { Router } from "express";
 import { ApiResponse } from "../entities/response.js";
 import { randomBytes } from "crypto";
 import { isAuthenticated, setUserId } from "../middleware/auth.js";
+import { Op } from "sequelize";
 import "dotenv/config";
 import axios from 'axios';
 export const usersRouter = Router();
@@ -35,12 +36,6 @@ const getTokenInfo = async (token) => {
 // Create a cryptographically secure random bearer token
 const generateBearerToken = () => {
   return randomBytes(32).toString('hex');
-}
-
-const getAllSkillsByUserId = async (userId) => {
-  return await UserSkill.findAll({
-    where: { userId }
-  });
 }
 
 usersRouter.get("/me", isAuthenticated, setUserId, async (req, res) => {
@@ -114,6 +109,30 @@ const bulkCreateAddUserSkills = async (userId, skills) => {
 
 // User skills
 usersRouter.get("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
+  const limit = req.query.limit || 10;
+  const offset = req.query.offset || 0;
+  const userId = +req.params.id;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res.status(403).json(new ApiResponse(403, "Forbidden: You can only view your own skills."));
+  // Get the user's skills
+  const results = await UserSkill.findAndCountAll({
+    where: { userId },
+    limit: limit,
+    offset: offset,
+    include: Skill,
+    order: [[Skill, 'skillName', 'ASC']]
+  });
+  const totalCount = results.count;
+  const skills = results.rows.map(userSkill => ({
+    id: userSkill.Skill.id,
+    name: userSkill.Skill.skillName
+  }));
+  res.status(200).json(new ApiResponse(200, "", { totalCount, skills }));
 });
 
 usersRouter.put("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
@@ -154,4 +173,77 @@ usersRouter.put("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
   catch(error) {
     return res.status(500).json(new ApiResponse(500, "Internal server error.", error.message));
   }
+});
+
+usersRouter.delete("/:id/skills/:skillId", isAuthenticated, setUserId, async (req, res) => {
+  const userId = +req.params.id;
+  const skillId = +req.params.skillId;
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res.status(403).json(new ApiResponse(403, "Forbidden: You can only update your own skills."));
+  // Verify the skill exists
+  const skill = await Skill.findByPk(skillId);
+  if (!skill)
+    return res.status(404).json(new ApiResponse(404, "Skill not found."));
+  // Verify the user has the skill
+  const userSkill = await UserSkill.findOne({
+    where: {
+      userId,
+      skillId
+    }
+  });
+  if (!userSkill)
+    return res.status(404).json(new ApiResponse(404, "User does not have the specified skill."));
+  // Delete the user skill
+  await userSkill.destroy();
+  res.status(200).json(new ApiResponse(200, "Skill removed successfully."));
+});
+
+usersRouter.post("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
+  const userId = +req.params.id;
+  const skillName = req.body.skillName;
+  let skillId = +(req.body.skillId !== undefined ? req.body.skillId : -1);
+  // If the user has not provided a skill name or id
+  if (!skillName && skillId === -1)
+    return res.status(400).json(new ApiResponse(400, "Missing information: Must provide a skill name or id."));
+  // Verify the user exists
+  const user = await User.findByPk(userId);
+  if (!user)
+    return res.status(404).json(new ApiResponse(404, "User not found."));
+  // Verify the user is the same as the one authenticated
+  if (userId != req.userId)
+    return res.status(403).json(new ApiResponse(403, "Forbidden: You can only update your own skills."));
+  // If the skillId is not provided
+  let skill = undefined;
+  if (skillId === -1) {
+    // Search for the skill name
+    skill = await Skill.findOne({ where: { skillName: { [Op.iLike]: skillName } } });
+    // If the skill does not exist, create it
+    if (!skill) {
+      skill = await Skill.create({ skillName });
+      skillId = skill.id;
+    }
+    else
+      skillId = skill.id;
+  }
+  // Verify the skill exists
+  skill = await Skill.findByPk(skillId);
+  if (!skill)
+    return res.status(404).json(new ApiResponse(404, "Skill not found."));
+  // Verify the user does not have the skill
+  const userSkill = await UserSkill.findOne({
+    where: {
+      userId,
+      skillId
+    }
+  });
+  if (userSkill)
+    return res.status(409).json(new ApiResponse(409, "User already has the specified skill."));
+  // Create the user skill
+  await UserSkill.create({ userId, skillId });
+  res.status(201).json(new ApiResponse(201, "Skill added successfully."));
 });

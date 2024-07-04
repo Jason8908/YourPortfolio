@@ -6,6 +6,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { User } from '../../classes/user';
+import { CookieLabels } from '../../app.constants';
 
 @Component({
   selector: 'app-auth-header',
@@ -21,7 +23,7 @@ import { MatMenuModule } from '@angular/material/menu';
   styleUrl: './auth-header.component.css',
 })
 export class AuthHeaderComponent {
-  user: any;
+  user: User = {} as User;
 
   constructor(
     private apiService: ApiService,
@@ -30,11 +32,11 @@ export class AuthHeaderComponent {
   ) {}
 
   getBearerToken() {
-    return this.cookieService.get('bearerToken');
+    return this.cookieService.get(CookieLabels.AUTH_TOKEN);
   }
 
   signOut() {
-    this.cookieService.delete('bearerToken');
+    this.cookieService.delete(CookieLabels.AUTH_TOKEN);
     this.router.navigate([''], { queryParams: { signOut: 'true' } });
   }
 
@@ -42,17 +44,16 @@ export class AuthHeaderComponent {
     const token = this.getBearerToken();
     // If no token in cookies, then navigate to the home page.
     if (!token) {
-      this.router.navigate(['']);
+      this.router.navigate([''], { queryParams: { signOut: 'true' } });
     }
 
     this.apiService.getUserInfo().subscribe(
       (response) => {
-        this.user = response.data;
-        console.log(this.user);
+        this.user = response.data as User;
       },
       (error) => {
-        console.log(`Error with the API: ${error}`);
-        this.router.navigate(['']);
+        console.log(`Error with the API: ${JSON.stringify(error)}`);
+        this.router.navigate([''], { queryParams: { signOut: 'true' } });
       }
     );
   }
