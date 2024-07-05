@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AddSkillDialogComponent } from '../add-skill-dialog/add-skill-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SpinnerDialogComponent } from '../spinner-dialog/spinner-dialog.component';
 
 @Component({
   selector: 'app-user-skills',
@@ -25,6 +26,7 @@ export class UserSkillsComponent {
   skills: Array<Skill> = [];
   skillCount: number = 0;
   readonly dialog = inject(MatDialog);
+  spinnerRef: any = null;
   constructor(
     private apiService: ApiService,
     private localStorage: LocalStorageService,
@@ -34,13 +36,29 @@ export class UserSkillsComponent {
     this.user = this.localStorage.getUser();
   }
 
+  showSpinner() {
+    if (this.spinnerRef) return;
+    this.spinnerRef = this.dialog.open(SpinnerDialogComponent, {
+      height: '150px',
+      width: '150px',
+    });
+  }
+
+  hideSpinner() {
+    if (!this.spinnerRef) return;
+    this.spinnerRef.close();
+    this.spinnerRef = null;
+  }
+
   setUserSkills() {
+    this.showSpinner();
     if (this.user) {
       this.apiService.getUserSkills(this.user.id).subscribe(
         (response) => {
           const results: SkillList = response.data;
           this.skills = results.skills;
           this.skillCount = results.totalCount;
+          this.hideSpinner();
         },
         (error) => {
           console.log(`Error with the API: ${JSON.stringify(error)}`);

@@ -1,4 +1,7 @@
 <mat-card *ngIf="jobData" appearance="outlined" class="description-card">
+  <button mat-flat-button (click)="generateCoverLetter(jobData)">
+    Generate Cover Letter
+  </button>
   <mat-card-header>
     <mat-card-title>{{ jobData.title }}</mat-card-title>
   </mat-card-header>

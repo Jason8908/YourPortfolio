@@ -4,6 +4,7 @@ import { usersRouter } from "./routers/users_router.js";
 import { skillsRouter } from "./routers/skills_router.js";
 import cors from "cors";
 import { jobsRouter } from "./routers/jobs_router.js";
+import { genAiRouter } from "./routers/gen_ai.js";
 
 const PORT = 3000;
 export const app = express();
@@ -26,6 +27,7 @@ try {
 app.use("/api/users", usersRouter);
 app.use("/api/jobs", jobsRouter);
 app.use("/api/skills", skillsRouter);
+app.use("/api/gen-ai", genAiRouter);
 
 app.listen(PORT, (err) => {
   if (err) console.log(err);

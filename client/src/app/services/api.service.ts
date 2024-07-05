@@ -8,6 +8,7 @@ import { ApiResponse } from '../classes/response';
 import { CookieLabels } from '../app.constants';
 import { UserExperience } from '../classes/experiences';
 import { pipe } from 'rxjs';
+import { JobData } from '../classes/job-data';
 
 @Injectable({
   providedIn: 'root',
@@ -199,6 +200,21 @@ export class ApiService {
         startDate: experience.startDate,
         endDate: experience.endDate,
         description: experience.description,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ) as Observable<ApiResponse>;
+  }
+
+  generateCoverLetter(jobData: JobData) {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.post(
+      `${this.endpoint}/api/gen-ai/letter`,
+      {
+        jobData,
       },
       {
         headers: {
