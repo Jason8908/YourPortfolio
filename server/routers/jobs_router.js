@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/auth.js";
-import { getIndeedJobs, getIndeedJobsIds } from "../services/indeed.js";
+import { getIndeedJobsv2, getIndeedJobsIds } from "../services/indeed.js";
 import { Job } from "../models/jobs.js";
 import { Op } from "sequelize";
 import { HttpStatusCode } from "axios";
@@ -32,7 +32,7 @@ jobsRouter.get("/search", async (req, res) => {
 
   let jobsToFind = ids.filter((id) => !foundJobIds.includes(id));
 
-  let newJobs = (await getIndeedJobs({ ids: jobsToFind }))
+  let newJobs = (await getIndeedJobsv2({ ids: jobsToFind }))
     .filter((res) => res.value && !res.value.error) //comment out to find edge cases with data retrieval
     .map((res) => res.value);
 

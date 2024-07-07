@@ -5,19 +5,22 @@ import puppeteer from "puppeteer";
 const REQUEST_DELAY = 600;
 
 async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        defaultViewport: {
+            width: 1280,
+            height: 800,
+        },
+    });
+
+
     try {
         const encodedQuery = encodeURIComponent(jobQuery);
         const encodedLocation = encodeURIComponent(jobLocation);
         const pageParam = page ? `&start=${page * 10}` : "";
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-            defaultViewport: {
-                width: 1280,
-                height: 800,
-            },
-        });
         const browserPage = await browser.newPage();
         await browserPage.setUserAgent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -31,11 +34,11 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
         const innerText = await browserPage.evaluate(() => {
             return JSON.parse(document.querySelector("body").innerText);
         });
-        browser.close();
+        await browser.close();
 
         return Object.keys(innerText.body.jobKeysWithTwoPaneEligibility);
     } catch {
-        browser.close();
+        await browser.close();
     }
 }
 
@@ -76,6 +79,48 @@ function getIndeedJobs({ ids }) {
     )
 
 }
+
+async function getIndeedJobsv2({ ids }) {
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        defaultViewport: {
+            width: 1280,
+            height: 800,
+        },
+    });
+
+    try {
+        const jobs = await Promise.all(ids.map(async id => await getIndeedJobFromIdv2({ browser, id })))
+
+        await browser.close()
+        return jobs
+    }
+
+    catch (e) {
+        console.log("YUNGCOS ERROR: " + error)
+        // await browser.close()
+    }
+
+
+
+}
+
+async function getIndeedJobFromIdv2({ browser, id }) {
+    const browserPage = await browser.newPage();
+    await browserPage.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    );
+
+    await browserPage.goto(`https://ca.indeed.com/viewjob?jk=${encodeURIComponent(id)}&spa=1`);
+    await browserPage.waitForSelector("pre", { timeout: 2_000 });
+
+    return await browserPage.evaluate(() => {
+        return JSON.parse(document.querySelector("body").innerText);
+    });
+}
+
 
 function parseIndeedOutput(externalId, jsonResponse) {
     try {
@@ -127,15 +172,39 @@ function parseIndeedOutput(externalId, jsonResponse) {
 //     })
 // })
 
-// const id = "922e764e164715d3"
+// const ids = ["922e764e164715d3", "922e764e164715d3", "922e764e164715d3", "922e764e164715d3"]
 
-// getIndeedJobFromId({ id }).then((res) => {
+// let res = await getIndeedJobsv2({ ids });
+// ((res) => {
 //     // console.log(typeof res)
 //     fs.writeFile('final.json', JSON.stringify(res), (err) => {
 
 //         // In case of a error throw err.
 //         if (err) throw err;
 //     })
-// })
+// })(res)
 
-export { getIndeedJobsIds, getIndeedJobs };
+// const browser = await puppeteer.launch({
+//     headless: false,
+//     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+//     defaultViewport: {
+//         width: 1280,
+//         height: 800,
+//     },
+// });
+
+// const browserPage = await browser.newPage();
+// await browserPage.setUserAgent(
+//     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+// );
+// await browserPage.goto(`https://ca.indeed.com/viewjob?jk=${encodeURIComponent(ids[0])}&spa=1`);
+// await browserPage.waitForSelector("pre", { timeout: 2_000 });
+
+// let test = await browserPage.evaluate(() => {
+//     return JSON.parse(document.querySelector("body").innerText);
+// });
+
+// console.log(test)
+
+
+export { getIndeedJobsIds, getIndeedJobs, getIndeedJobsv2 };
