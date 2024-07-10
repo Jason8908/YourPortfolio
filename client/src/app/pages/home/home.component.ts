@@ -1,76 +1,59 @@
 import { Component } from '@angular/core';
-import {
-  SocialAuthService,
-  GoogleSigninButtonModule,
-} from '@abacritt/angularx-social-login';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { ApiService } from '../../services/api.service';
 import { CookieService } from 'ngx-cookie-service';
-import { LocalStorageService } from '../../services/local-storage.service';
-import { User } from '../../classes/user';
 import { CookieLabels } from '../../app.constants';
+import { NgIf } from '@angular/common';
+import { HomeNavbarComponent } from "../../components/home-navbar/home-navbar.component";
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [GoogleSigninButtonModule],
+  imports: [
+    NgIf,
+    HomeNavbarComponent,
+    MatButtonModule,
+    MatIconModule
+  ],
 })
 export class HomeComponent {
-  signOut: boolean = false;
+  isAuth: boolean = false;
+  loginUrl = `${environment.apiEndpoint}/api/auth/login/google`
   constructor(
-    private authService: SocialAuthService,
     private router: Router,
     private route: ActivatedRoute,
     private apiService: ApiService,
     private cookieService: CookieService,
-    private localStorage: LocalStorageService,
   ) {
     this.route.queryParamMap.subscribe((params) => {
-      this.signOut = params.get('signOut') === 'true';
+      const token = params.get('token');
+      // If the token is present, store it in a cookie and reload the page.
+      if (token) {
+        this.cookieService.set(CookieLabels.AUTH_TOKEN, token, undefined, '/');
+        this.router.navigate(['']);
+      }
     });
   }
 
   ngOnInit(): void {
-    this.authService.authState.subscribe((user) => {
-      if (this.signOut) {
-        this.signOut = false;
-        return;
-      }
-      // Get an access token from the GoogleLoginProvider.
-      this.authService
-        .getAccessToken(GoogleLoginProvider.PROVIDER_ID)
-        .then((token) => {
-          // Send the access token to the API.
-          this.apiService
-            .sendAuth(token, user.firstName, user.lastName, user.email)
-            .subscribe(
-              (response) => {
-                // Storing the bearer token in a cookie.
-                this.cookieService.delete(CookieLabels.AUTH_TOKEN);
-                this.cookieService.set(
-                  CookieLabels.AUTH_TOKEN,
-                  response.data.accessToken,
-                );
-                // Getting and setting user information.
-                this.apiService.getUserInfo().subscribe(
-                  (response) => {
-                    const user: User = response.data as User;
-                    this.localStorage.setUser(user);
-                    this.router.navigate(['dashboard']);
-                  },
-                  (error) => {
-                    console.log(`Error with the API: ${JSON.stringify(error)}`);
-                  },
-                );
-              },
-              (error) => {
-                console.log(`Error with the API: ${JSON.stringify(error)}`);
-              },
-            );
-        });
+    this.apiService.getUserInfo().subscribe(() => {
+      this.isAuth = true;
+    }, (error) => {
+      this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
+      console.log(error);
     });
+  }
+
+  redirectToGoogle() {
+    window.location.href = this.loginUrl;
+  }
+
+  updateAuth(newState: boolean) {
+    this.isAuth = newState;
   }
 }

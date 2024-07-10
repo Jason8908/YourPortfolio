@@ -1,0 +1,19 @@
+<mat-toolbar color="primary" class="navbar">
+  <span>YourPortfolio</span>
+  <a mat-button routerLink="/">Home</a>
+  <a mat-button routerLink="/">About</a>
+  <span class="spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="isAuth">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/dashboard">
+      <mat-icon>assignment_ind</mat-icon>
+      <span>Dashboard</span>
+    </button>
+    <button mat-menu-item (click)="signOut()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
