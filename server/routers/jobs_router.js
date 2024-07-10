@@ -20,6 +20,8 @@ jobsRouter.get("/search", async (req, res) => {
       .json({ error: "Please wait until calling this again" });
   }
 
+
+
   let jobs = await Job.findAll({
     where: {
       externalId: {
@@ -29,16 +31,13 @@ jobsRouter.get("/search", async (req, res) => {
   });
 
   let foundJobIds = jobs.map((job) => job.externalId);
-
   let jobsToFind = ids.filter((id) => !foundJobIds.includes(id));
-
-  let newJobs = (await getIndeedJobsv2({ ids: jobsToFind }))
-    .filter((res) => res.value && !res.value.error) //comment out to find edge cases with data retrieval
-    .map((res) => res.value);
+  let newJobs = await getIndeedJobsv2({ ids: jobsToFind })
 
   try {
     await Job.bulkCreate(newJobs);
-  } catch (e) {
+  }
+  catch (e) {
     return res.status(500).json({
       error: `Cannot insert new data into database - ${e.toString()}`,
       data: newJobs,

@@ -5,6 +5,7 @@ import { skillsRouter } from "./routers/skills_router.js";
 import cors from "cors";
 import { jobsRouter } from "./routers/jobs_router.js";
 import { genAiRouter } from "./routers/gen_ai.js";
+import { Atrribute } from "./models/attributes.js";
 
 const PORT = 3000;
 export const app = express();

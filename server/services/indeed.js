@@ -6,6 +6,10 @@ const REQUEST_DELAY = 600;
 
 async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
 
+    const encodedQuery = encodeURIComponent(jobQuery);
+    const encodedLocation = encodeURIComponent(jobLocation);
+    const pageParam = page ? `&start=${page * 10}` : "";
+
     const browser = await puppeteer.launch({
         headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -15,11 +19,7 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
         },
     });
 
-
     try {
-        const encodedQuery = encodeURIComponent(jobQuery);
-        const encodedLocation = encodeURIComponent(jobLocation);
-        const pageParam = page ? `&start=${page * 10}` : "";
 
         const browserPage = await browser.newPage();
         await browserPage.setUserAgent(
@@ -37,8 +37,9 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
         await browser.close();
 
         return Object.keys(innerText.body.jobKeysWithTwoPaneEligibility);
-    } catch {
+    } catch (err) {
         await browser.close();
+        console.log(err)
     }
 }
 
@@ -93,13 +94,12 @@ async function getIndeedJobsv2({ ids }) {
 
     try {
         const jobs = await Promise.all(ids.map(async id => await getIndeedJobFromIdv2({ browser, id })))
-
         await browser.close()
         return jobs
     }
 
     catch (e) {
-        console.log("YUNGCOS ERROR: " + error)
+        console.log("YUNGCOS ERROR: " + e)
         // await browser.close()
     }
 
@@ -116,11 +116,12 @@ async function getIndeedJobFromIdv2({ browser, id }) {
     await browserPage.goto(`https://ca.indeed.com/viewjob?jk=${encodeURIComponent(id)}&spa=1`);
     await browserPage.waitForSelector("pre", { timeout: 2_000 });
 
-    return await browserPage.evaluate(() => {
+    let jsonResponse = await browserPage.evaluate(() => {
         return JSON.parse(document.querySelector("body").innerText);
     });
-}
 
+    return parseIndeedOutput(id, jsonResponse)
+}
 
 function parseIndeedOutput(externalId, jsonResponse) {
     try {
@@ -151,6 +152,7 @@ function parseIndeedOutput(externalId, jsonResponse) {
             attributes,
         };
     } catch (error) {
+        console.log(error.toString())
         return {
             error: error.toString(),
         };
