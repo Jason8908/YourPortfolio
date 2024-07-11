@@ -1,11 +1,12 @@
 import { sequelize } from "./datasource.js";
 import express from "express";
+import "dotenv/config";
 import { usersRouter } from "./routers/users_router.js";
 import { skillsRouter } from "./routers/skills_router.js";
 import cors from "cors";
 import { jobsRouter } from "./routers/jobs_router.js";
 import { genAiRouter } from "./routers/gen_ai.js";
-import { Atrribute } from "./models/attributes.js";
+import { authRouter } from "./routers/auth_router.js";
 
 const PORT = 3000;
 export const app = express();
@@ -29,6 +30,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/jobs", jobsRouter);
 app.use("/api/skills", skillsRouter);
 app.use("/api/gen-ai", genAiRouter);
+app.use("/api/auth", authRouter);
 
 app.listen(PORT, (err) => {
   if (err) console.log(err);

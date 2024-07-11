@@ -13,7 +13,7 @@ export const Session = sequelize.define(
     },
     accessToken: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     expiresAt: {
       type: DataTypes.DATE,

@@ -36,15 +36,15 @@ export class AuthHeaderComponent {
   }
 
   signOut() {
-    this.cookieService.delete(CookieLabels.AUTH_TOKEN);
-    this.router.navigate([''], { queryParams: { signOut: 'true' } });
+    this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
+    this.router.navigate(['']);
   }
 
   ngOnInit() {
     const token = this.getBearerToken();
     // If no token in cookies, then navigate to the home page.
     if (!token) {
-      this.router.navigate([''], { queryParams: { signOut: 'true' } });
+      this.router.navigate(['']);
     }
 
     this.apiService.getUserInfo().subscribe(
@@ -53,7 +53,7 @@ export class AuthHeaderComponent {
       },
       (error) => {
         console.log(`Error with the API: ${JSON.stringify(error)}`);
-        this.router.navigate([''], { queryParams: { signOut: 'true' } });
+        this.router.navigate(['']);
       },
     );
   }
