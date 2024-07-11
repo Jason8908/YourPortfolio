@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import fs from "fs";
 import puppeteer from "puppeteer";
+import { getSkills } from "./check-skill.js";
 
 const REQUEST_DELAY = 600;
 
@@ -43,44 +44,6 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
     }
 }
 
-function getIndeedJobFromId({ id }) {
-    return fetch(`https://ca.indeed.com/viewjob?jk=${encodeURIComponent(id)}&spa=1`, {
-        "headers": {
-            "accept": "*/*",
-            "accept-language": "en-US,en;q=0.9",
-            "priority": "u=1, i",
-            "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "Referer": "https://ca.indeed.com/jobs?q=test+engineer&l=Scarborough%2C+ON&from=searchOnHP&vjk=0030a5c1d61c3f8a",
-            "Referrer-Policy": "origin-when-cross-origin"
-        },
-        "body": null,
-        "method": "GET"
-    })
-        .then(res => {
-            if (res.status != 200) {
-                return Promise.reject("Too many requests");
-            }
-            return (res.json().then(res => parseIndeedOutput(id, res)));
-        })
-}
-
-function getIndeedJobs({ ids }) {
-
-    return Promise.allSettled(
-        ids.map((id, ind) =>
-            new Promise((res, rej) => {
-                setTimeout(() => getIndeedJobFromId({ id }).then(out => res(out)).catch(out => rej(out)), REQUEST_DELAY * ind)
-            })
-        )
-    )
-
-}
-
 async function getIndeedJobsv2({ ids }) {
 
     const browser = await puppeteer.launch({
@@ -95,15 +58,28 @@ async function getIndeedJobsv2({ ids }) {
     try {
         const jobs = await Promise.all(ids.map(async id => await getIndeedJobFromIdv2({ browser, id })))
         await browser.close()
+        let allAttributesSet = jobs.reduce(
+            (acc, curr) => acc.union(new Set(curr.attributes)),
+            new Set()
+        )
+
+        let allAttributes = [...allAttributesSet]
+
+        let skillList = await getSkills(allAttributes)
+
+        jobs.forEach(job => {
+            job.attributes = job.attributes.filter(attribute => skillList.includes(attribute))
+        })
+
+        console.log(jobs.map(j => j.attributes))
+
         return jobs
     }
 
     catch (e) {
-        console.log("YUNGCOS ERROR: " + e)
-        // await browser.close()
+        console.log(e)
+        return []
     }
-
-
 
 }
 
@@ -209,4 +185,4 @@ function parseIndeedOutput(externalId, jsonResponse) {
 // console.log(test)
 
 
-export { getIndeedJobsIds, getIndeedJobs, getIndeedJobsv2 };
+export { getIndeedJobsIds, getIndeedJobsv2 };
