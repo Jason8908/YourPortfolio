@@ -1,27 +1,35 @@
 <mat-card *ngIf="jobData" appearance="outlined" class="description-card">
-  <button mat-flat-button (click)="generateCoverLetter(jobData)">
-    Generate Cover Letter
-  </button>
+
   <mat-card-header>
     <mat-card-title>{{ jobData.title }}</mat-card-title>
+    <mat-card-subtitle>{{jobData.employer}}</mat-card-subtitle>
   </mat-card-header>
-  <mat-card-header>
-    <div class="job-description" [innerHTML]="jobData.description"></div>
-  </mat-card-header>
-  <mat-card-content>
+  <hr>
+  <mat-card-actions>
+    <button mat-flat-button (click)="generateCoverLetter(jobData)">
+      Generate Cover Letter
+    </button>
+  </mat-card-actions>
+  <hr>
+  <mat-card-content *ngIf="jobData.attributes && jobData.attributes.length > 0">
+    <p>Skills Required For Position</p>
+    <mat-chip-set>
+      <mat-chip *ngFor="let attribute of jobData.attributes">
+        {{ attribute }}
+      </mat-chip>
+    </mat-chip-set>
+  </mat-card-content>
+  <hr *ngIf="jobData.attributes && jobData.attributes.length > 0">
+  <mat-card-content *ngIf="jobData.benefits && jobData.benefits.length > 0">
     <p>Benefits</p>
+    <mat-chip-set>
+      <mat-chip *ngFor="let benefit of jobData.benefits">
+        {{ benefit }}
+      </mat-chip>
+    </mat-chip-set>
   </mat-card-content>
-  <mat-chip-set>
-    <mat-chip *ngFor="let benefit of jobData.benefits">
-      {{ benefit }}
-    </mat-chip>
-  </mat-chip-set>
+  <hr *ngIf="jobData.benefits && jobData.benefits.length > 0">
   <mat-card-content>
-    <p>Associated attributes</p>
+    <div class="job-description" [innerHTML]="jobData.description"></div>
   </mat-card-content>
-  <mat-chip-set>
-    <mat-chip *ngFor="let attribute of jobData.attributes">
-      {{ attribute }}
-    </mat-chip>
-  </mat-chip-set>
 </mat-card>

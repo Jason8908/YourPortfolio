@@ -2,4 +2,33 @@
     display: flex;
     justify-content: center;
     padding: 40px;
+    padding-bottom: calc(40px - 20.87px);
 }
+
+.job-container{
+    max-height: calc(100vh 
+    /* Header */
+    - 63.99px
+    /* Search Bar */
+    - 135.97px
+    /* Margin */
+    );
+    overflow-y: scroll;
+    border-top: #666 2px solid;
+}
+
+.job-description-container{
+    position: relative;
+}
+
+.job-container::-webkit-scrollbar {
+    width: 10px;
+  }
+   
+  .job-container::-webkit-scrollbar-thumb {
+    background: #666;
+  }
+  
+  .job-container::-webkit-scrollbar-track {
+    background: #ddd;
+  }

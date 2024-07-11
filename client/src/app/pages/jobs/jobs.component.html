@@ -4,12 +4,12 @@
   <app-job-search (newSearch)="onSearch($event)"></app-job-search>
 </div>
 
-<div class="row">
+<div class="row job-container">
   <div class="col-4">
     <app-job-preview *ngFor="let jobData of jobSearchResult" [jobData]="jobData" (click)="setItem(jobData.id)">
     </app-job-preview>
   </div>
   <div class="col-8">
-    <app-job-description [jobData]="currentJob"> </app-job-description>
+    <app-job-description [jobData]="currentJob" class="job-description-container"> </app-job-description>
   </div>
 </div>
