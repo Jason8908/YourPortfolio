@@ -1,14 +1,12 @@
 <app-auth-header> </app-auth-header>
 
-<app-job-search (newSearch)="onSearch($event)"></app-job-search>
+<div class="job-search-center">
+  <app-job-search (newSearch)="onSearch($event)"></app-job-search>
+</div>
 
 <div class="row">
   <div class="col-4">
-    <app-job-preview
-      *ngFor="let jobData of jobSearchResult"
-      [jobData]="jobData"
-      (click)="setItem(jobData.id)"
-    >
+    <app-job-preview *ngFor="let jobData of jobSearchResult" [jobData]="jobData" (click)="setItem(jobData.id)">
     </app-job-preview>
   </div>
   <div class="col-8">

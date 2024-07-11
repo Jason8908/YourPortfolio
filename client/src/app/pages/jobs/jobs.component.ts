@@ -8,6 +8,7 @@ import { JobSearchComponent } from '../../components/job-search/job-search.compo
 import { JobSearchRequest } from '../../models/jobSearch';
 import { SpinnerDialogComponent } from '../../components/spinner-dialog/spinner-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-jobs',
@@ -27,7 +28,7 @@ export class JobsComponent {
   currentJob: any = undefined;
   spinnerRef: any = null;
   readonly dialog = inject(MatDialog);
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
 
   showSpinner() {
     if (this.spinnerRef) return;
@@ -49,10 +50,16 @@ export class JobsComponent {
 
   onSearch(search: JobSearchRequest) {
     this.showSpinner();
-    this.apiService.getJobs(search).subscribe((res) => {
-      this.jobSearchResult = res.data;
-      this.currentJob = res.data[0];
-      this.hideSpinner();
+    this.apiService.getJobs(search).subscribe({
+      next: (res) => {
+        this.jobSearchResult = res.data;
+        this.currentJob = res.data[0];
+        this.hideSpinner();
+      },
+      error: (err) => {
+        this.hideSpinner();
+        this.snackBar.open(err.toString(), 'OK');
+      },
     });
   }
 }
