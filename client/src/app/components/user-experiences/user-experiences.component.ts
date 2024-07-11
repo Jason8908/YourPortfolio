@@ -1,4 +1,4 @@
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,17 +13,22 @@ import { LocalStorageService } from '../../services/local-storage.service';
 import { Router } from '@angular/router';
 import { User } from '../../classes/user';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-user-experiences',
   standalone: true,
   imports: [
     NgFor,
+    NgIf,
     MatListModule,
     MatIconModule,
     MatButtonModule,
     AddInterestDialogComponent,
     MatExpansionModule,
+    MatChipsModule,
+    MatCardModule,
   ],
   templateUrl: './user-experiences.component.html',
   styleUrl: './user-experiences.component.css',
@@ -35,7 +40,7 @@ export class UserExperiencesComponent {
   constructor(
     private apiService: ApiService,
     private localStorage: LocalStorageService,
-    private router: Router,
+    private router: Router
   ) {
     this.user = this.localStorage.getUser();
   }
@@ -69,7 +74,25 @@ export class UserExperiencesComponent {
         },
         (error) => {
           console.log(`Error adding user experience: ${JSON.stringify(error)}`);
+        }
+      );
+    });
+  }
+
+  updateExperience(expData: UserExperience) {
+    let dialogRef = this.dialog.open(AddUserExperienceDialogComponent, {
+      width: '800px',
+      data: { ...expData },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == null) return;
+      this.apiService.updateUserExperience(this.user!.id, result).subscribe(
+        () => {
+          this.updateUserExperiences();
         },
+        (error) => {
+          console.log(`Error adding user experience: ${JSON.stringify(error)}`);
+        }
       );
     });
   }
@@ -90,9 +113,9 @@ export class UserExperiencesComponent {
             },
             (error) => {
               console.log(
-                `Error deleting user experience: ${JSON.stringify(error)}`,
+                `Error deleting user experience: ${JSON.stringify(error)}`
               );
-            },
+            }
           );
       }
     });

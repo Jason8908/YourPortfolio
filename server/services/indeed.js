@@ -71,8 +71,6 @@ async function getIndeedJobsv2({ ids }) {
             job.attributes = job.attributes.filter(attribute => skillList.includes(attribute))
         })
 
-        console.log(jobs.map(j => j.attributes))
-
         return jobs
     }
 

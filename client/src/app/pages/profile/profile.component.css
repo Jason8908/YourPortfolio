@@ -1,4 +1,9 @@
 .profile-wrapper {
-  width: 98%;
+  width: 70%;
+  max-width: 1200px;
+  padding: 20px;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }

@@ -5,7 +5,7 @@ import { ApiService } from '../../services/api.service';
 import { CommonModule } from '@angular/common';
 import { JobDescriptionComponent } from '../../components/job-description/job-description.component';
 import { JobSearchComponent } from '../../components/job-search/job-search.component';
-import { JobSearchRequest } from '../../models/jobSearch';
+import { JobSearchRequest } from '../../classes/jobSearch';
 import { SpinnerDialogComponent } from '../../components/spinner-dialog/spinner-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';

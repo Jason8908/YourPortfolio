@@ -10,7 +10,6 @@ const VERTEX_MODEL = process.env.VERTEX_MODEL;
 
 
 async function checkSkills(attributes) {
-    console.log(typeof attributes)
     const prompt = `The following is a comma seperated list of attributes:
 
 ${attributes.join(",")}

@@ -13,11 +13,20 @@ import { Router } from '@angular/router';
 import { AddSkillDialogComponent } from '../add-skill-dialog/add-skill-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SpinnerDialogComponent } from '../spinner-dialog/spinner-dialog.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-user-skills',
   standalone: true,
-  imports: [NgFor, MatListModule, MatIconModule, MatButtonModule],
+  imports: [
+    NgFor,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatCardModule,
+  ],
   templateUrl: './user-skills.component.html',
   styleUrl: './user-skills.component.css',
 })
@@ -31,7 +40,7 @@ export class UserSkillsComponent {
     private apiService: ApiService,
     private localStorage: LocalStorageService,
     private router: Router,
-    private snackBar: MatSnackBar,
+    private snackBar: MatSnackBar
   ) {
     this.user = this.localStorage.getUser();
   }
@@ -62,7 +71,7 @@ export class UserSkillsComponent {
         },
         (error) => {
           console.log(`Error with the API: ${JSON.stringify(error)}`);
-        },
+        }
       );
     }
   }
@@ -89,12 +98,12 @@ export class UserSkillsComponent {
           },
           (error) => {
             console.log(`Error with the API: ${JSON.stringify(error)}`);
-          },
+          }
         );
       },
       (error) => {
         console.log(`Error with the dialog: ${JSON.stringify(error)}`);
-      },
+      }
     );
   }
 
@@ -111,7 +120,7 @@ export class UserSkillsComponent {
             },
             (error) => {
               console.log(`Error with the API: ${JSON.stringify(error)}`);
-            },
+            }
           );
         } else if (typeof result === 'number') {
           // If the result is a number, then call addUserSkill.
@@ -126,13 +135,13 @@ export class UserSkillsComponent {
                 });
               } else
                 console.log(`Error with the API: ${JSON.stringify(error)}`);
-            },
+            }
           );
         }
       },
       (error) => {
         console.log(`Error with the dialog: ${JSON.stringify(error)}`);
-      },
+      }
     );
   }
 }

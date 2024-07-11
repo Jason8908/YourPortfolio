@@ -11,6 +11,8 @@ import { LocalStorageService } from '../../services/local-storage.service';
 import { Router } from '@angular/router';
 import { AddInterestDialogComponent } from '../add-interest-dialog/add-interest-dialog.component';
 import { ApiService } from '../../services/api.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-user-interests',
@@ -21,6 +23,8 @@ import { ApiService } from '../../services/api.service';
     MatIconModule,
     MatButtonModule,
     AddInterestDialogComponent,
+    MatCardModule,
+    MatChipsModule,
   ],
   templateUrl: './user-interests.component.html',
   styleUrl: './user-interests.component.css',
@@ -32,7 +36,7 @@ export class UserInterestsComponent {
   constructor(
     private localStorage: LocalStorageService,
     private router: Router,
-    private apiService: ApiService,
+    private apiService: ApiService
   ) {
     this.user = this.localStorage.getUser();
   }

@@ -8,7 +8,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
-import { JobSearchRequest } from '../../models/jobSearch';
+import { JobSearchRequest } from '../../classes/jobSearch';
 
 @Component({
   selector: 'app-job-search',

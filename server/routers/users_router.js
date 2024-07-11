@@ -556,6 +556,58 @@ usersRouter.post(
   },
 );
 
+usersRouter.patch(
+  "/:id/experiences",
+  isAuthenticated,
+  setUserId,
+  async (req, res) => {
+    const userId = +req.params.id;
+    const { id, company, position, startDate, endDate, description } = req.body;
+    // Verify the user exists
+    const user = await User.findByPk(userId);
+    if (!user)
+      return res.status(404).json(new ApiResponse(404, "User not found."));
+    // Verify the user is the same as the one authenticated
+    if (userId != req.userId)
+      return res
+        .status(403)
+        .json(
+          new ApiResponse(
+            403,
+            "Forbidden: You can only update your own experiences.",
+          ),
+        );
+    // Verify the required information is provided
+    if (!id)
+      return res
+        .status(400)
+        .json(
+          new ApiResponse(
+            400,
+            "Missing information: Must provide ID",
+          ),
+        );
+
+    let userExperience = await UserExperience.findByPk(id)
+
+    // Create the user experience
+    await userExperience.update({
+      userId,
+      company,
+      position,
+      startDate,
+      endDate,
+      description,
+    });
+
+    await userExperience.save()
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Experience added successfully."));
+  },
+);
+
 usersRouter.delete(
   "/:id/experiences/:experienceId",
   isAuthenticated,

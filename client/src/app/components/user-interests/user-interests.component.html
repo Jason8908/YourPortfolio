@@ -1,15 +1,20 @@
-<div class="interests-wrapper">
-  <h3>Interests</h3>
-  <button mat-fab extended (click)="addInterest()">
-    <mat-icon>lightbulb</mat-icon>
-    Add an Interest
-  </button>
-  <mat-list role="list">
-    <mat-list-item role="listitem" *ngFor="let interest of interests">
-      <span>{{ interest.interest }}</span>
-      <mat-icon matListItemIcon (click)="deleteInterest(interest.id)"
-        >close</mat-icon
-      >
-    </mat-list-item>
-  </mat-list>
-</div>
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Interests</mat-card-title>
+  </mat-card-header>
+  <mat-card-actions>
+    <button mat-button (click)="addInterest()">
+      Add Intrest
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-card-actions>
+  <mat-card-content>
+    <mat-chip-set>
+      <mat-chip *ngFor="let interest of interests">{{interest.interest}}
+        <button matChipRemove (click)="deleteInterest(interest.id)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-chip>
+    </mat-chip-set>
+  </mat-card-content>
+</mat-card>
