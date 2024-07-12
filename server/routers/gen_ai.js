@@ -1,4 +1,4 @@
-import e, { Router } from "express";
+import { Router } from "express";
 import { isAuthenticated, setUserId } from "../middleware/auth.js";
 import { HttpStatusCode } from "axios";
 import { ApiResponse } from "../entities/response.js";
@@ -8,6 +8,9 @@ import { User } from "../models/users.js";
 import { UserSkill } from "../models/userSkills.js";
 import { Skill } from "../models/skills.js";
 import { UserExperience } from "../models/userexperiences.js";
+import { generateCoverLetterBrown } from "../services/docx.js";
+import { CoverLetter } from "../entities/cover-letter.js";
+import fs from "fs";
 
 const PROJECT_ID = process.env.PROJECT_ID;
 const REGION = process.env.GOOGLE_REGION;
@@ -65,6 +68,15 @@ const createJobDataString = (jobData) => {
   return `${position || "Some position"} at ${company || "some company"}. Description: ${description.join("\n")}`;
 };
 
+const extractCoverLetterData = (paragraphs = []) => {
+  let letterParagraphs = [];
+  for (let i = 0; i < paragraphs.length; i++)
+    letterParagraphs[i] = paragraphs[i];
+  if (paragraphs.length > 4)
+    letterParagraphs[3] = paragraphs[paragraphs.length - 1];
+  return new CoverLetter('', '', '', '', '', '', '', '', '', letterParagraphs);
+}
+
 genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res) => {
   const userId = req.userId;
   if (!PROJECT_ID || !REGION)
@@ -121,7 +133,8 @@ genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res) => {
     Do not include any text other than the actual cover letter itself.\n
     Do not include any placeholders or text that I may need to replace; absolutely NO '[' or ']' symbols; if there is missing information, make it generic and generally applicable.\n
     The cover letter must have an introduction, two body paragraphs, and a conclusion.\n
-    Do NOT include the location where the job posting was found.`;
+    Do NOT include the location where the job posting was found.\n
+    Do NOT include the introductory line "Dear Hiring Manager" or the farewell line.\n`;
   const vertexAI = new VertexAI({ project: PROJECT_ID, location: REGION });
   const generativeModel = vertexAI.getGenerativeModel({
     model: VERTEX_MODEL,
@@ -129,7 +142,11 @@ genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res) => {
   const resp = await generativeModel.generateContent(prompt);
   const content = resp.response;
   const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  return res
-    .status(HttpStatusCode.Ok)
-    .json(new ApiResponse(HttpStatusCode.Ok, "", result));
+  const coverLetter = extractCoverLetterData(result);
+  const letterPath = await generateCoverLetterBrown(coverLetter);
+  // Checks if letterPath exists and leads to a real file
+  console.log(`${fs.existsSync(letterPath) ? 'File exists' : 'File does not exist'} - ${letterPath}`);
+
+  // Returning the generated cover letter as a docx file over Express
+  return res.download(letterPath, coverLetter.getLetterName());
 });

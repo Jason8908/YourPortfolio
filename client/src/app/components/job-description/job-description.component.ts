@@ -40,9 +40,10 @@ export class JobDescriptionComponent {
   };
   generateCoverLetter(jobData: JobData) {
     this.apiService.generateCoverLetter(jobData).subscribe((response) => {
-      this.dialog.open(MultilineDisplayDialogComponent, {
-        data: { title: 'Cover Letter', lines: response.data },
-      });
+      // This response responds with a docx file using expressJs res.download, make the user download this file
+      // this.dialog.open(MultilineDisplayDialogComponent, {
+      //   data: { title: 'Cover Letter', lines: response.data },
+      // });
     });
   }
 }

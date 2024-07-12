@@ -233,7 +233,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    ) as Observable<ApiResponse>;
+      },
+    ) as Observable<any>;
   }
 }
