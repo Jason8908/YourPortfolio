@@ -10,4 +10,5 @@ export interface JobData {
   jobTypes: string[];
   link: string;
   attributes: string[];
+  saved: boolean;
 }

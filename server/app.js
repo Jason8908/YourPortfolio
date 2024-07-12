@@ -5,7 +5,7 @@ import { usersRouter } from "./routers/users_router.js";
 import { skillsRouter } from "./routers/skills_router.js";
 import cors from "cors";
 import { jobsRouter } from "./routers/jobs_router.js";
-import { genAiRouter } from "./routers/gen_ai.js";
+// import { genAiRouter } from "./routers/gen_ai.js";
 import { authRouter } from "./routers/auth_router.js";
 
 const PORT = 3000;
@@ -29,7 +29,7 @@ try {
 app.use("/api/users", usersRouter);
 app.use("/api/jobs", jobsRouter);
 app.use("/api/skills", skillsRouter);
-app.use("/api/gen-ai", genAiRouter);
+// app.use("/api/gen-ai", genAiRouter);
 app.use("/api/auth", authRouter);
 
 app.listen(PORT, (err) => {

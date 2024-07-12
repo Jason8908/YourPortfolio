@@ -241,6 +241,7 @@ export class ApiService {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.post<ApiResponse>(
       `${this.endpoint}/api/jobs/${jobId}/save`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${token}`,
