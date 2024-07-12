@@ -1,24 +1,20 @@
 <mat-toolbar color="primary" class="navbar">
   <span>YourPortfolio</span>
   <a mat-button routerLink="/dashboard">Home</a>
-  <a mat-button routerLink="/dashboard/jobs">Jobs</a>
-  <a mat-button>Applications</a>
+  <a mat-button routerLink="/dashboard/profile">My Profile</a>
+  <a mat-button>Saved Jobs</a>
   <span class="spacer"></span>
   <button mat-icon-button [matMenuTriggerFor]="menu">
     <mat-icon>account_circle</mat-icon>
   </button>
   <mat-menu #menu="matMenu">
-    <button mat-menu-item routerLink="/dashboard/profile">
-      <mat-icon>assignment_ind</mat-icon>
-      <span>Profile</span>
+    <button mat-menu-item>
+      <mat-icon>settings</mat-icon>
+      <span>Account</span>
     </button>
     <button mat-menu-item (click)="signOut()">
       <mat-icon>logout</mat-icon>
       <span>Sign Out</span>
-    </button>
-    <button mat-menu-item>
-      <mat-icon>settings</mat-icon>
-      <span>Settings</span>
     </button>
   </mat-menu>
 </mat-toolbar>

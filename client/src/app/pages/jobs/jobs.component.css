@@ -23,12 +23,18 @@
 
 .job-container::-webkit-scrollbar {
     width: 10px;
-  }
-   
-  .job-container::-webkit-scrollbar-thumb {
-    background: #666;
-  }
-  
-  .job-container::-webkit-scrollbar-track {
-    background: #ddd;
-  }
+}
+
+.job-container::-webkit-scrollbar-thumb {
+background: #666;
+}
+
+.job-container::-webkit-scrollbar-track {
+background: #ddd;
+}
+
+.no-results{
+    width: 100%;
+    text-align: center;
+    padding-top: 50px;
+}

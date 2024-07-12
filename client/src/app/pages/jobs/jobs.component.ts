@@ -9,6 +9,7 @@ import { JobSearchRequest } from '../../classes/jobSearch';
 import { SpinnerDialogComponent } from '../../components/spinner-dialog/spinner-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-jobs',
@@ -28,7 +29,15 @@ export class JobsComponent {
   currentJob: any = undefined;
   spinnerRef: any = null;
   readonly dialog = inject(MatDialog);
-  constructor(private apiService: ApiService, private snackBar: MatSnackBar) {}
+  public currentQuery: any;
+  constructor(
+    private apiService: ApiService,
+    private snackBar: MatSnackBar,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.currentQuery = {};
+  }
 
   showSpinner() {
     if (this.spinnerRef) return;
@@ -64,6 +73,18 @@ export class JobsComponent {
   }
 
   ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      if (!params['query'] || !params['location']) {
+        this.router.navigate(['dashboard']);
+      } else {
+        this.currentQuery = {
+          query: params['query'],
+          location: params['location'],
+        };
+        this.onSearch(this.currentQuery);
+      }
+    });
+
     this.jobSearchResult = {
       data: [
         {
