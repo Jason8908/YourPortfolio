@@ -40,10 +40,18 @@ export class JobDescriptionComponent {
   };
   generateCoverLetter(jobData: JobData) {
     this.apiService.generateCoverLetter(jobData).subscribe((response) => {
-      // This response responds with a docx file using expressJs res.download, make the user download this file
-      // this.dialog.open(MultilineDisplayDialogComponent, {
-      //   data: { title: 'Cover Letter', lines: response.data },
-      // });
+      const buffer = response as Uint8Array;
+      // Convert the buffer into a docx file blob
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+      // Create a link element and click it to download the file.
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `cover-letter.docx`;
+      // Append the link to the body and click it.
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     });
   }
 }

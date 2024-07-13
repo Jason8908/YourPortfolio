@@ -10,7 +10,7 @@ import { Skill } from "../models/skills.js";
 import { UserExperience } from "../models/userexperiences.js";
 import { generateCoverLetterBrown } from "../services/docx.js";
 import { CoverLetter } from "../entities/cover-letter.js";
-import fs from "fs";
+import stream from "stream";
 
 const PROJECT_ID = process.env.PROJECT_ID;
 const REGION = process.env.GOOGLE_REGION;
@@ -68,16 +68,48 @@ const createJobDataString = (jobData) => {
   return `${position || "Some position"} at ${company || "some company"}. Description: ${description.join("\n")}`;
 };
 
-const extractCoverLetterData = (paragraphs = []) => {
+const extractCoverLetterData = (paragraphs = [], user = null, jobData = null) => {
+  // Parsing paragraphs
   let letterParagraphs = [];
   for (let i = 0; i < paragraphs.length; i++)
     letterParagraphs[i] = paragraphs[i];
   if (paragraphs.length > 4)
     letterParagraphs[3] = paragraphs[paragraphs.length - 1];
-  return new CoverLetter('', '', '', '', '', '', '', '', '', letterParagraphs);
+  // User information
+  const fname = user ? user.fname : '';
+  const lname = user ? user.lname : '';
+  const email = user ? user.email : '';
+  // Job information
+  const company = jobData?.employer ? jobData.employer : '';
+  const companyAddress = jobData?.address ? jobData.address : (jobData?.location ? jobData.location : '');
+  const location = jobData?.location ? (companyAddress === jobData.location ? '' : jobData.location) : '';
+  return new CoverLetter(fname, lname, '', '', email, 'Hiring Manager', company, companyAddress, location, letterParagraphs);
 }
 
-genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res) => {
+const promptVertexCoverLetter = async (user, experiences, jobData, skills) => {
+  const experiencesString = createUserExperienceString(experiences);
+  const jobDataString = createJobDataString(jobData);
+  // LLM Prompt to generate cover letter
+  const prompt = `My name is ${user.fname} ${user.lname}. Write a cover letter for me; do not place any tokens in it.\n
+    ${jobDataString ? `The following is the job posintg: \n${jobDataString}. \n` : ""}
+    ${skills.length > 0 ? `My Skills: ${skills.join(", ")}. \n` : ""}
+    ${experiencesString.length > 0 ? `Experiences: ${experiencesString}. \n` : ""}
+    Do not include any text other than the actual cover letter itself.\n
+    Do not include any placeholders or text that I may need to replace; absolutely NO '[' or ']' symbols; if there is missing information, make it generic and generally applicable.\n
+    The cover letter must have an introduction, two body paragraphs, and a conclusion.\n
+    Do NOT include the location where the job posting was found.\n
+    Do NOT include the introductory line "Dear Hiring Manager" or the farewell line.\n`;
+  const vertexAI = new VertexAI({ project: PROJECT_ID, location: REGION });
+  const generativeModel = vertexAI.getGenerativeModel({
+    model: VERTEX_MODEL,
+  });
+  const resp = await generativeModel.generateContent(prompt);
+  const content = resp.response;
+  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
+  return result;
+}
+
+genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res, next) => {
   const userId = req.userId;
   if (!PROJECT_ID || !REGION)
     return res
@@ -113,7 +145,6 @@ genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res) => {
           "User requires at least one experience to generate a cover letter.",
         ),
       );
-  const experiencesString = createUserExperienceString(experiences);
   const jobData = req.body.jobData;
   if (!jobData)
     return res
@@ -124,29 +155,14 @@ genAiRouter.post("/letter", isAuthenticated, setUserId, async (req, res) => {
           "Missing job data in request body.",
         ),
       );
-  const jobDataString = createJobDataString(jobData);
-  // LLM Prompt to generate cover letter
-  const prompt = `My name is ${user.fname} ${user.lname}. Write a cover letter for me; do not place any tokens in it.\n
-    ${jobDataString ? `The following is the job posintg: \n${jobDataString}. \n` : ""}
-    ${skills.length > 0 ? `My Skills: ${skills.join(", ")}. \n` : ""}
-    ${experiencesString.length > 0 ? `Experiences: ${experiencesString}. \n` : ""}
-    Do not include any text other than the actual cover letter itself.\n
-    Do not include any placeholders or text that I may need to replace; absolutely NO '[' or ']' symbols; if there is missing information, make it generic and generally applicable.\n
-    The cover letter must have an introduction, two body paragraphs, and a conclusion.\n
-    Do NOT include the location where the job posting was found.\n
-    Do NOT include the introductory line "Dear Hiring Manager" or the farewell line.\n`;
-  const vertexAI = new VertexAI({ project: PROJECT_ID, location: REGION });
-  const generativeModel = vertexAI.getGenerativeModel({
-    model: VERTEX_MODEL,
-  });
-  const resp = await generativeModel.generateContent(prompt);
-  const content = resp.response;
-  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  const coverLetter = extractCoverLetterData(result);
-  const letterPath = await generateCoverLetterBrown(coverLetter);
-  // Checks if letterPath exists and leads to a real file
-  console.log(`${fs.existsSync(letterPath) ? 'File exists' : 'File does not exist'} - ${letterPath}`);
-
+  const paragraphs = await promptVertexCoverLetter(skills, experiences, jobData, skills);
+  const coverLetter = extractCoverLetterData(paragraphs, user, jobData);
+  const buffer = await generateCoverLetterBrown(coverLetter);
   // Returning the generated cover letter as a docx file over Express
-  return res.download(letterPath, coverLetter.getLetterName());
+  const streamBuffer = new stream.PassThrough();
+  streamBuffer.end(buffer);
+  res.setHeader("Content-Disposition", `attachment; filename=cover-letter.docx`);
+  res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+  streamBuffer.pipe(res);
+  return next();
 });

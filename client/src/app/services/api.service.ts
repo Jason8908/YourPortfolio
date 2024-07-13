@@ -223,6 +223,7 @@ export class ApiService {
   }
 
   generateCoverLetter(jobData: JobData) {
+    console.log(jobData);
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.post(
       `${this.endpoint}/api/gen-ai/letter`,
@@ -232,7 +233,9 @@ export class ApiService {
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         },
+        responseType: 'arraybuffer',
       },
     ) as Observable<any>;
   }
