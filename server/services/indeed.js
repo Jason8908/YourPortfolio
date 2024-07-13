@@ -12,7 +12,7 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
     const pageParam = page ? `&start=${page * 10}` : "";
 
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         defaultViewport: {
             width: 1280,
@@ -24,7 +24,7 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
 
         const browserPage = await browser.newPage();
         await browserPage.setUserAgent(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
         );
 
         await browserPage.goto(

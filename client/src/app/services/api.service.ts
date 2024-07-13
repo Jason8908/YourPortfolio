@@ -239,4 +239,39 @@ export class ApiService {
       },
     ) as Observable<any>;
   }
+
+  saveJob(jobId: number): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.post<ApiResponse>(
+      `${this.endpoint}/api/jobs/${jobId}/save`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  unsaveJob(jobId: number): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.delete<ApiResponse>(
+      `${this.endpoint}/api/jobs/${jobId}/save`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
+  getSavedJobs(offset = 0, limit = 10): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.get<ApiResponse>(`${this.endpoint}/api/jobs/saved`, {
+      params: { offset, limit },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 }

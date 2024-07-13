@@ -8,6 +8,8 @@ import { ApiService } from '../../services/api.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MultilineDisplayDialogComponent } from '../multiline-display-dialog/multiline-display-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-job-description',
@@ -18,13 +20,15 @@ import { MatDialog } from '@angular/material/dialog';
     MatProgressBarModule,
     MatChipsModule,
     MatButtonModule,
+    MatIconModule,
   ],
   templateUrl: './job-description.component.html',
   styleUrl: './job-description.component.css',
 })
 export class JobDescriptionComponent {
   readonly dialog = inject(MatDialog);
-  constructor(private apiService: ApiService) {}
+  public saved = false;
+  constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
   @Input({ required: true }) jobData: JobData = {
     id: 0,
     externalId: '',
@@ -37,6 +41,7 @@ export class JobDescriptionComponent {
     jobTypes: [],
     link: '',
     attributes: [],
+    saved: false,
   };
   generateCoverLetter(jobData: JobData) {
     this.apiService.generateCoverLetter(jobData).subscribe((response) => {
@@ -52,6 +57,24 @@ export class JobDescriptionComponent {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    });
+  }
+
+  saveJob(jobId: number) {
+    this.apiService.saveJob(jobId).subscribe((res) => {
+      this.jobData.saved = true;
+      this.snackbar.open('Job Saved!', 'OK', {
+        duration: 5000,
+      });
+    });
+  }
+
+  unsaveJob(jobId: number) {
+    this.apiService.unsaveJob(jobId).subscribe((res) => {
+      this.jobData.saved = false;
+      this.snackbar.open('Job Unsaved!', 'OK', {
+        duration: 5000,
+      });
     });
   }
 }

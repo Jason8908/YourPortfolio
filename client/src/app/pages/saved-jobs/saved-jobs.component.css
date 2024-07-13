@@ -1,0 +1,29 @@
+.no-results{
+    width: 100%;
+    text-align: center;
+    padding-top: 50px;
+}
+
+.saved-container{
+    max-height: calc(100vh 
+    /* Header */
+    - 63.99px
+    /* Search Bar */
+    - 55.99px
+    /* Margin */
+    );
+    overflow-y: scroll;
+    border-top: #666 2px solid;
+}
+
+.saved-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.saved-container::-webkit-scrollbar-thumb {
+background: #666;
+}
+
+.saved-container::-webkit-scrollbar-track {
+background: #ddd;
+}

@@ -5,7 +5,21 @@
     <mat-card-subtitle>{{jobData.employer}}</mat-card-subtitle>
   </mat-card-header>
   <hr>
-  <mat-card-actions>
+  <mat-card-actions class="job-buttons">
+    <button color="accent" *ngIf="!jobData.saved; else showUnsave" mat-flat-button (click)="saveJob(jobData.id)">
+      <mat-icon>
+        star
+      </mat-icon>
+      Save Job
+    </button>
+    <ng-template #showUnsave>
+      <button mat-flat-button (click)="unsaveJob(jobData.id)">
+        <mat-icon>
+          star
+        </mat-icon>
+        Unsave Job
+      </button>
+    </ng-template>
     <button mat-flat-button (click)="generateCoverLetter(jobData)">
       Generate Cover Letter
     </button>

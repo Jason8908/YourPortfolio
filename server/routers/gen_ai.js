@@ -12,61 +12,61 @@ import { generateCoverLetterBrown } from "../services/docx.js";
 import { CoverLetter } from "../entities/cover-letter.js";
 import stream from "stream";
 
-const PROJECT_ID = process.env.PROJECT_ID;
-const REGION = process.env.GOOGLE_REGION;
-const VERTEX_MODEL = process.env.VERTEX_MODEL;
+// const PROJECT_ID = process.env.PROJECT_ID;
+// const REGION = process.env.GOOGLE_REGION;
+// const VERTEX_MODEL = process.env.VERTEX_MODEL;
 
-export const genAiRouter = Router();
+// export const genAiRouter = Router();
 
-const getUserSkills = async (userId) => {
-  const skills = await UserSkill.findAll({
-    where: { userId },
-    include: Skill,
-  });
-  return skills.map((skill) => skill.Skill.skillName);
-};
+// const getUserSkills = async (userId) => {
+//   const skills = await UserSkill.findAll({
+//     where: { userId },
+//     include: Skill,
+//   });
+//   return skills.map((skill) => skill.Skill.skillName);
+// };
 
-const getUserExperience = async (userId) => {
-  const experiences = await UserExperience.findAll({
-    where: { userId },
-  });
-  return experiences.map((experience) => ({
-    company: experience.company,
-    position: experience.position,
-    startDate: experience.startDate,
-    endDate: experience.endDate,
-    description: experience.description,
-  }));
-};
+// const getUserExperience = async (userId) => {
+//   const experiences = await UserExperience.findAll({
+//     where: { userId },
+//   });
+//   return experiences.map((experience) => ({
+//     company: experience.company,
+//     position: experience.position,
+//     startDate: experience.startDate,
+//     endDate: experience.endDate,
+//     description: experience.description,
+//   }));
+// };
 
-const createUserExperienceString = (experiences) => {
-  return experiences
-    .map((experience) => {
-      const startDate = experience.startDate.toLocaleDateString();
-      const endDate = experience.endDate
-        ? experience.endDate.toLocaleDateString()
-        : "Present";
-      return `${experience.position} at ${experience.company} from ${startDate} to ${endDate}. Description: ${experience.description}`;
-    })
-    .join("\n");
-};
+// const createUserExperienceString = (experiences) => {
+//   return experiences
+//     .map((experience) => {
+//       const startDate = experience.startDate.toLocaleDateString();
+//       const endDate = experience.endDate
+//         ? experience.endDate.toLocaleDateString()
+//         : "Present";
+//       return `${experience.position} at ${experience.company} from ${startDate} to ${endDate}. Description: ${experience.description}`;
+//     })
+//     .join("\n");
+// };
 
-const getUser = async (userId) => {
-  const user = await User.findByPk(userId);
-  return user;
-};
+// const getUser = async (userId) => {
+//   const user = await User.findByPk(userId);
+//   return user;
+// };
 
-const createJobDataString = (jobData) => {
-  if (!jobData) return "";
-  const position = jobData.title || "";
-  const company = jobData.employer || "";
-  let description = (jobData.description || "").split("\n");
-  for (let i = 0; i < description.length; i++) {
-    description[i] = description[i].trim();
-    description[i] = description[i].replace(/<[^>]*>?/gm, "");
-  }
-  return `${position || "Some position"} at ${company || "some company"}. Description: ${description.join("\n")}`;
-};
+// const createJobDataString = (jobData) => {
+//   if (!jobData) return "";
+//   const position = jobData.title || "";
+//   const company = jobData.employer || "";
+//   let description = (jobData.description || "").split("\n");
+//   for (let i = 0; i < description.length; i++) {
+//     description[i] = description[i].trim();
+//     description[i] = description[i].replace(/<[^>]*>?/gm, "");
+//   }
+//   return `${position || "Some position"} at ${company || "some company"}. Description: ${description.join("\n")}`;
+// };
 
 const extractCoverLetterData = (paragraphs = [], user = null, jobData = null) => {
   // Parsing paragraphs
