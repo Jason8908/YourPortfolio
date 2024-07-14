@@ -9,6 +9,7 @@ import { randomBytes } from "crypto";
 import { isAuthenticated, setUserId } from "../middleware/auth.js";
 import { UserExperience } from "../models/userexperiences.js";
 import { Op } from "sequelize";
+import { Balance } from "../models/balance.js";
 import "dotenv/config";
 import axios from "axios";
 export const usersRouter = Router();
@@ -581,14 +582,9 @@ usersRouter.patch(
     if (!id)
       return res
         .status(400)
-        .json(
-          new ApiResponse(
-            400,
-            "Missing information: Must provide ID",
-          ),
-        );
+        .json(new ApiResponse(400, "Missing information: Must provide ID"));
 
-    let userExperience = await UserExperience.findByPk(id)
+    let userExperience = await UserExperience.findByPk(id);
 
     // Create the user experience
     await userExperience.update({
@@ -600,7 +596,7 @@ usersRouter.patch(
       description,
     });
 
-    await userExperience.save()
+    await userExperience.save();
 
     res
       .status(200)
@@ -659,3 +655,18 @@ usersRouter.delete(
       .json(new ApiResponse(200, "Experience removed successfully."));
   },
 );
+
+// USER BALANCE
+
+usersRouter.get("/balance", isAuthenticated, setUserId, async (req, res) => {
+  let userBalance = await Balance.findOne({ where: { userId: req.userId } });
+  if (!userBalance) {
+    userBalance = await Balance.create({ userId: req.userId });
+    await userBalance.save();
+  }
+  const result = {
+    userId: req.userId,
+    credits: userBalance.credits,
+  };
+  return res.status(200).json(new ApiResponse(200, "", result));
+});

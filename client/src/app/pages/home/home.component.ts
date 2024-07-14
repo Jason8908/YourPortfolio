@@ -4,7 +4,7 @@ import { ApiService } from '../../services/api.service';
 import { CookieService } from 'ngx-cookie-service';
 import { CookieLabels } from '../../app.constants';
 import { NgIf } from '@angular/common';
-import { HomeNavbarComponent } from "../../components/home-navbar/home-navbar.component";
+import { HomeNavbarComponent } from '../../components/home-navbar/home-navbar.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { environment } from '../../../environments/environment';
@@ -14,16 +14,11 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [
-    NgIf,
-    HomeNavbarComponent,
-    MatButtonModule,
-    MatIconModule
-  ],
+  imports: [NgIf, HomeNavbarComponent, MatButtonModule, MatIconModule],
 })
 export class HomeComponent {
   isAuth: boolean = false;
-  loginUrl = `${environment.apiEndpoint}/api/auth/login/google`
+  loginUrl = `${environment.apiEndpoint}/api/auth/login/google`;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -35,18 +30,21 @@ export class HomeComponent {
       // If the token is present, store it in a cookie and reload the page.
       if (token) {
         this.cookieService.set(CookieLabels.AUTH_TOKEN, token, undefined, '/');
-        this.router.navigate(['']);
+        this.router.navigate(['/dashboard']);
       }
     });
   }
 
   ngOnInit(): void {
-    this.apiService.getUserInfo().subscribe(() => {
-      this.isAuth = true;
-    }, (error) => {
-      this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
-      console.log(error);
-    });
+    this.apiService.getUserInfo().subscribe(
+      () => {
+        this.isAuth = true;
+      },
+      (error) => {
+        this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
+        console.log(error);
+      },
+    );
   }
 
   redirectToGoogle() {

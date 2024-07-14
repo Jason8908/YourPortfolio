@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, model } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable, map } from 'rxjs';
@@ -9,6 +9,7 @@ import { CookieLabels } from '../app.constants';
 import { UserExperience } from '../classes/experiences';
 import { pipe } from 'rxjs';
 import { JobData } from '../classes/job-data';
+import { AIModels } from '../constants/ai-models';
 
 @Injectable({
   providedIn: 'root',
@@ -16,13 +17,16 @@ import { JobData } from '../classes/job-data';
 export class ApiService {
   endpoint = environment.apiEndpoint;
 
-  constructor(private http: HttpClient, private cookieService: CookieService) {}
+  constructor(
+    private http: HttpClient,
+    private cookieService: CookieService,
+  ) {}
 
   sendAuth(
     token: string,
     firstName: string,
     lastName: string,
-    email: string
+    email: string,
   ): Observable<any> {
     return this.http.post(`${this.endpoint}/api/users/auth`, {
       accessToken: token,
@@ -54,7 +58,7 @@ export class ApiService {
   getUserSkills(
     userId: Number,
     offset = 0,
-    limit = 10
+    limit = 10,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.get(`${this.endpoint}/api/users/${userId}/skills`, {
@@ -73,7 +77,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
@@ -86,7 +90,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
@@ -99,7 +103,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
@@ -116,7 +120,7 @@ export class ApiService {
   getUserInterests(
     userId: Number,
     offset = 0,
-    limit = 10
+    limit = 10,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.get(`${this.endpoint}/api/users/${userId}/interests`, {
@@ -129,7 +133,7 @@ export class ApiService {
 
   deleteUserInterest(
     userId: Number,
-    interestId: Number
+    interestId: Number,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.delete(
@@ -138,7 +142,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
@@ -151,14 +155,14 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
   getUserExperiences(
     userId: Number,
     offset = 0,
-    limit = 5
+    limit = 5,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.get(`${this.endpoint}/api/users/${userId}/experiences`, {
@@ -171,7 +175,7 @@ export class ApiService {
 
   updateUserExperience(
     userId: Number,
-    userExp: UserExperience
+    userExp: UserExperience,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.patch(
@@ -181,13 +185,13 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
   deleteUserExperience(
     userId: Number,
-    experienceId: Number
+    experienceId: Number,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.delete(
@@ -196,13 +200,13 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
   addUserExperience(
     userId: Number,
-    experience: UserExperience
+    experience: UserExperience,
   ): Observable<ApiResponse> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.post(
@@ -218,11 +222,14 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     ) as Observable<ApiResponse>;
   }
 
-  generateCoverLetter(jobData: JobData) {
+  generateCoverLetter(
+    jobData: JobData,
+    selectedAIModel: string = AIModels.Gemini15Flash,
+  ): Observable<any> {
     console.log(jobData);
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.post(
@@ -233,7 +240,11 @@ export class ApiService {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          Accept:
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        },
+        params: {
+          model: selectedAIModel,
         },
         responseType: 'arraybuffer',
       },
@@ -249,7 +260,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
   }
 
@@ -261,7 +272,7 @@ export class ApiService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
   }
 
@@ -273,5 +284,31 @@ export class ApiService {
         Authorization: `Bearer ${token}`,
       },
     });
+  }
+
+  getUserBalance(): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.get<ApiResponse>(`${this.endpoint}/api/users/balance`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  getTopUpOptions(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.endpoint}/api/products/topup`);
+  }
+
+  createCheckoutUrl(priceId: string): Observable<ApiResponse> {
+    const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
+    return this.http.post<ApiResponse>(
+      `${this.endpoint}/api/stripe/checkout`,
+      { priceId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
   }
 }

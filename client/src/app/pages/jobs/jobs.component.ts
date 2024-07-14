@@ -10,6 +10,7 @@ import { SpinnerDialogComponent } from '../../components/spinner-dialog/spinner-
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-jobs',
@@ -28,15 +29,21 @@ export class JobsComponent {
   jobSearchResult: any[] = [];
   currentJob: any = undefined;
   spinnerRef: any = null;
+  balance: number = 0;
   readonly dialog = inject(MatDialog);
   public currentQuery: any;
+  triggerCreditsRefresh: Subject<void> = new Subject<void>();
   constructor(
     private apiService: ApiService,
     private snackBar: MatSnackBar,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {
     this.currentQuery = {};
+  }
+
+  onAIReturn() {
+    this.triggerCreditsRefresh.next();
   }
 
   showSpinner() {
@@ -73,6 +80,10 @@ export class JobsComponent {
         this.snackBar.open(err.toString(), 'OK');
       },
     });
+  }
+
+  updateBalance(newBalance: number) {
+    this.balance = newBalance;
   }
 
   ngOnInit() {

@@ -1,4 +1,7 @@
-<app-home-navbar [isAuth]="isAuth" (onAuthChange)="updateAuth($event)"></app-home-navbar>
+<app-home-navbar
+  [isAuth]="isAuth"
+  (onAuthChange)="updateAuth($event)"
+></app-home-navbar>
 <button mat-fab extended *ngIf="!isAuth" (click)="redirectToGoogle()">
   <mat-icon>login</mat-icon>
   Continue with Google

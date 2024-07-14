@@ -19,8 +19,8 @@ export const User = sequelize.define(
     },
     googleRefreshToken: {
       type: DataTypes.STRING,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   {
     quoteIdentifiers: false,

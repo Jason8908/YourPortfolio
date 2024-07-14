@@ -36,7 +36,7 @@ export class UserInterestsComponent {
   constructor(
     private localStorage: LocalStorageService,
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
   ) {
     this.user = this.localStorage.getUser();
   }

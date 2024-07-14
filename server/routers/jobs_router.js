@@ -13,11 +13,10 @@ export const jobsRouter = Router();
 const checkSaved = (job) => {
   if (job.User?.length > 0) {
     job.saved = true;
-  }
-  else {
+  } else {
     job.saved = false;
   }
-}
+};
 
 jobsRouter.get("/search", isAuthenticated, async (req, res) => {
   let ids = await getIndeedJobsIds({
@@ -32,28 +31,23 @@ jobsRouter.get("/search", isAuthenticated, async (req, res) => {
       .json({ error: "Please wait until calling this again" });
   }
 
-
-
   let jobs = await Job.findAll({
     where: {
       externalId: {
         [Op.in]: ids,
       },
     },
-    include: UserJob
+    include: UserJob,
   });
-
-
 
   let foundJobIds = jobs.map((job) => job.externalId);
   let jobsToFind = ids.filter((id) => !foundJobIds.includes(id));
-  let newJobs = await getIndeedJobsv2({ ids: jobsToFind })
+  let newJobs = await getIndeedJobsv2({ ids: jobsToFind });
   let newJobsWithId = [];
 
   try {
     newJobsWithId = await Job.bulkCreate(newJobs);
-  }
-  catch (e) {
+  } catch (e) {
     return res.status(500).json({
       error: `Cannot insert new data into database - ${e.toString()}`,
       data: newJobs,
@@ -66,55 +60,51 @@ jobsRouter.get("/search", isAuthenticated, async (req, res) => {
 });
 
 jobsRouter.post("/:id/save", isAuthenticated, setUserId, async (req, res) => {
-
   try {
-    let job = await Job.findByPk(req.params.id)
+    let job = await Job.findByPk(req.params.id);
     if (job === null) {
-      return res.status(404).json(new ApiResponse(404, `Job Not Found with id ${req.params.id}`))
+      return res
+        .status(404)
+        .json(new ApiResponse(404, `Job Not Found with id ${req.params.id}`));
     }
 
     let savedJob = await UserJob.create({
-      JobId: job.id, UserId: req.userId
-    })
+      JobId: job.id,
+      UserId: req.userId,
+    });
 
-    return res.status(201).json(new ApiResponse(201, "", savedJob))
+    return res.status(201).json(new ApiResponse(201, "", savedJob));
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json(new ApiResponse(500, e.toString()));
   }
-
-  catch (e) {
-    console.log(e)
-    return res.status(500).json(new ApiResponse(500, e.toString()))
-  }
-})
+});
 
 jobsRouter.delete("/:id/save", isAuthenticated, setUserId, async (req, res) => {
-
   try {
-    let job = await Job.findByPk(req.params.id)
+    let job = await Job.findByPk(req.params.id);
     if (job === null) {
-      return res.status(404).json(new ApiResponse(404, "Job Not Found"))
+      return res.status(404).json(new ApiResponse(404, "Job Not Found"));
     }
 
     let deletedJob = await UserJob.destroy({
       where: {
         JobId: job.id,
-        UserId: req.userId
-      }
-    })
+        UserId: req.userId,
+      },
+    });
 
     if (deletedJob == 0) {
-      return res.status(400).json(new ApiResponse(500, "Job was not saved"))
+      return res.status(400).json(new ApiResponse(500, "Job was not saved"));
     }
 
-    return res.status(201).json(new ApiResponse(201, "Job Deleted"))
+    return res.status(201).json(new ApiResponse(201, "Job Deleted"));
+  } catch (e) {
+    res.status(500).json(new ApiResponse(500, e));
   }
-
-  catch (e) {
-    res.status(500).json(new ApiResponse(500, e))
-  }
-})
+});
 
 jobsRouter.get("/saved", isAuthenticated, setUserId, async (req, res) => {
-
   const limit = req.query.limit || 10;
   const offset = req.query.offset || 0;
 
@@ -123,9 +113,7 @@ jobsRouter.get("/saved", isAuthenticated, setUserId, async (req, res) => {
     limit: limit,
     offset: offset,
     include: Job,
-    order: [
-      ["updatedAt", "DESC"],
-    ],
+    order: [["updatedAt", "DESC"]],
   });
 
   const totalCount = results.count;

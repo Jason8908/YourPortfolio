@@ -40,7 +40,7 @@ export class UserExperiencesComponent {
   constructor(
     private apiService: ApiService,
     private localStorage: LocalStorageService,
-    private router: Router
+    private router: Router,
   ) {
     this.user = this.localStorage.getUser();
   }
@@ -74,7 +74,7 @@ export class UserExperiencesComponent {
         },
         (error) => {
           console.log(`Error adding user experience: ${JSON.stringify(error)}`);
-        }
+        },
       );
     });
   }
@@ -92,7 +92,7 @@ export class UserExperiencesComponent {
         },
         (error) => {
           console.log(`Error adding user experience: ${JSON.stringify(error)}`);
-        }
+        },
       );
     });
   }
@@ -113,9 +113,9 @@ export class UserExperiencesComponent {
             },
             (error) => {
               console.log(
-                `Error deleting user experience: ${JSON.stringify(error)}`
+                `Error deleting user experience: ${JSON.stringify(error)}`,
               );
-            }
+            },
           );
       }
     });

@@ -24,7 +24,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 export class AddUserExperienceDialogComponent {
   exp: UserExperience = {} as UserExperience;
   constructor(
-    @Inject(MAT_DIALOG_DATA) public expData: UserExperience | undefined
+    @Inject(MAT_DIALOG_DATA) public expData: UserExperience | undefined,
   ) {
     if (expData) {
       this.exp = expData;

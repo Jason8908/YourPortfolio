@@ -26,7 +26,7 @@ export class DashboardComponent {
   user: User = {} as User;
   constructor(
     private router: Router,
-    private localStorage: LocalStorageService
+    private localStorage: LocalStorageService,
   ) {}
 
   onSearch(search: JobSearchRequest) {

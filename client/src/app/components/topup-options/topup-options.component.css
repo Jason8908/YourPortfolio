@@ -1,0 +1,29 @@
+.topup-option-card {
+  width: 80%;
+}
+
+.topup-option-header {
+  justify-content: center;
+}
+
+.topup-option-icon {
+  transform: scale(2);
+}
+
+.icon-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 10%;
+}
+
+mat-card-content p {
+  text-align: center;
+}
+
+mat-card-subtitle {
+  text-align: center;
+}
+
+mat-card-actions {
+  justify-content: center;
+}

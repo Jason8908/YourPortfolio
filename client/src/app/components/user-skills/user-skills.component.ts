@@ -40,7 +40,7 @@ export class UserSkillsComponent {
     private apiService: ApiService,
     private localStorage: LocalStorageService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.user = this.localStorage.getUser();
   }
@@ -71,7 +71,7 @@ export class UserSkillsComponent {
         },
         (error) => {
           console.log(`Error with the API: ${JSON.stringify(error)}`);
-        }
+        },
       );
     }
   }
@@ -98,12 +98,12 @@ export class UserSkillsComponent {
           },
           (error) => {
             console.log(`Error with the API: ${JSON.stringify(error)}`);
-          }
+          },
         );
       },
       (error) => {
         console.log(`Error with the dialog: ${JSON.stringify(error)}`);
-      }
+      },
     );
   }
 
@@ -120,7 +120,7 @@ export class UserSkillsComponent {
             },
             (error) => {
               console.log(`Error with the API: ${JSON.stringify(error)}`);
-            }
+            },
           );
         } else if (typeof result === 'number') {
           // If the result is a number, then call addUserSkill.
@@ -135,13 +135,13 @@ export class UserSkillsComponent {
                 });
               } else
                 console.log(`Error with the API: ${JSON.stringify(error)}`);
-            }
+            },
           );
         }
       },
       (error) => {
         console.log(`Error with the dialog: ${JSON.stringify(error)}`);
-      }
+      },
     );
   }
 }

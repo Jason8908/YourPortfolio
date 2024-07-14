@@ -14,7 +14,18 @@ export class CoverLetter {
   par2;
   par3;
   par4;
-  constructor(fromFName = "", fromLName = "", fromStreetAddress = "", fromPhoneNum = "", fromEmail = "", toName = "", toCompany1 = "", toCompany2 = "", toStreetAddress = "", paragraphs = []) {
+  constructor(
+    fromFName = "",
+    fromLName = "",
+    fromStreetAddress = "",
+    fromPhoneNum = "",
+    fromEmail = "",
+    toName = "",
+    toCompany1 = "",
+    toCompany2 = "",
+    toStreetAddress = "",
+    paragraphs = [],
+  ) {
     this.fromFName = fromFName;
     this.fromLName = fromLName;
     this.fromStreetAddress = fromStreetAddress;
@@ -30,16 +41,12 @@ export class CoverLetter {
     this.par3 = paragraphs[2] || "";
     this.par4 = paragraphs[3] || "";
     let headerInfo = [];
-    if (fromStreetAddress.length > 0)
-      headerInfo.push(fromStreetAddress);
-    if (fromPhoneNum.length > 0)
-      headerInfo.push(fromPhoneNum);
-    if (fromEmail.length > 0)
-      headerInfo.push(fromEmail);
+    if (fromStreetAddress.length > 0) headerInfo.push(fromStreetAddress);
+    if (fromPhoneNum.length > 0) headerInfo.push(fromPhoneNum);
+    if (fromEmail.length > 0) headerInfo.push(fromEmail);
     if (headerInfo.length > 0)
       this.fromHeaderInformation = headerInfo.join(" | ");
-    else
-      this.fromHeaderInformation = "";
+    else this.fromHeaderInformation = "";
   }
   getLetterName() {
     const date = new Date();

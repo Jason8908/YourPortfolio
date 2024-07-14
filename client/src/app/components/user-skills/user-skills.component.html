@@ -10,7 +10,8 @@
   </mat-card-actions>
   <mat-card-content>
     <mat-chip-set>
-      <mat-chip *ngFor="let skill of skills">{{skill.name}}
+      <mat-chip *ngFor="let skill of skills"
+        >{{ skill.name }}
         <button matChipRemove (click)="deleteSkill(skill.id)">
           <mat-icon>close</mat-icon>
         </button>

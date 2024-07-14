@@ -18,8 +18,9 @@
           <mat-panel-description>
             {{ formatDate(exp.startDate) }} &#8212;
             {{
-            exp.endDate ? formatDate(exp.endDate) : "Present"
-            }}</mat-panel-description>
+              exp.endDate ? formatDate(exp.endDate) : "Present"
+            }}</mat-panel-description
+          >
           <button mat-icon-button (click)="updateExperience(exp)">
             <mat-icon>edit</mat-icon>
           </button>
@@ -29,12 +30,10 @@
         </mat-expansion-panel-header>
         <div>
           <p *ngIf="exp.description">
-            {{exp.description}}
+            {{ exp.description }}
           </p>
           <p *ngIf="!exp.description">
-            <i>
-              No Description Provided
-            </i>
+            <i> No Description Provided </i>
           </p>
         </div>
       </mat-expansion-panel>

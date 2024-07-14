@@ -1,0 +1,13 @@
+mat-card-content {
+  padding-left: 3%;
+  padding-top: 1%;
+}
+
+.user-balance-display {
+  width: 50%;
+  margin-left: 0;
+}
+
+.user-balance {
+  font-size: 1.2em;
+}

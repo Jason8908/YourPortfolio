@@ -13,19 +13,19 @@ export const authRouter = Router();
 const googleOAuthClient = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_CALLBACK_URL
+  process.env.GOOGLE_CALLBACK_URL,
 );
 
 const yourportRedirect = process.env.YOURPORT_AUTH_URL;
 
 const scopes = [
-  'https://www.googleapis.com/auth/userinfo.email',
-  'https://www.googleapis.com/auth/userinfo.profile'
+  "https://www.googleapis.com/auth/userinfo.email",
+  "https://www.googleapis.com/auth/userinfo.profile",
 ];
 
 const loginUrl = googleOAuthClient.generateAuthUrl({
-  access_type: 'offline',
-  scope: scopes
+  access_type: "offline",
+  scope: scopes,
 });
 
 const getUserInfo = async (jwt, refreshToken = null) => {
@@ -35,7 +35,7 @@ const getUserInfo = async (jwt, refreshToken = null) => {
     user = await User.create({
       email: userInfo.email,
       fname: userInfo.given_name,
-      lname: userInfo.family_name
+      lname: userInfo.family_name,
     });
   }
   if (refreshToken) {
@@ -43,7 +43,7 @@ const getUserInfo = async (jwt, refreshToken = null) => {
     await user.save();
   }
   return user;
-}
+};
 
 // Create a cryptographically secure random bearer token
 const generateBearerToken = () => {
@@ -54,13 +54,20 @@ authRouter.get("/login/google", (req, res) => {
   return res.redirect(loginUrl);
 });
 
-authRouter.get('/redirect/google', async (req, res) => {
+authRouter.get("/redirect/google", async (req, res) => {
   const code = req.query.code;
   if (!code)
-    return res.status(HttpStatusCode.Unauthorized).json(new ApiResponse(HttpStatusCode.Unauthorized, 'Google login failed. Missing code query parameter.'));
+    return res
+      .status(HttpStatusCode.Unauthorized)
+      .json(
+        new ApiResponse(
+          HttpStatusCode.Unauthorized,
+          "Google login failed. Missing code query parameter.",
+        ),
+      );
 
   try {
-    const {tokens} = await googleOAuthClient.getToken(code);
+    const { tokens } = await googleOAuthClient.getToken(code);
 
     const user = await getUserInfo(tokens.id_token, tokens.refresh_token);
     const bearerToken = generateBearerToken();
@@ -69,17 +76,22 @@ authRouter.get('/redirect/google', async (req, res) => {
       id: bearerToken,
       accessToken: tokens.access_token,
       expiresAt: new Date(tokens.expiry_date),
-      userId: user.id
+      userId: user.id,
     });
-    
+
     return res.redirect(`${yourportRedirect}/?token=${session.id}`);
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err);
-    return res.status(HttpStatusCode.Unauthorized).json(new ApiResponse(HttpStatusCode.Unauthorized, 'Google login failed'));
+    return res
+      .status(HttpStatusCode.Unauthorized)
+      .json(
+        new ApiResponse(HttpStatusCode.Unauthorized, "Google login failed"),
+      );
   }
 });
 
 authRouter.get("/login", (req, res) => {
-  res.status(HttpStatusCode.Unauthorized).json(new ApiResponse(HttpStatusCode.Unauthorized, 'Google login failed'));
+  res
+    .status(HttpStatusCode.Unauthorized)
+    .json(new ApiResponse(HttpStatusCode.Unauthorized, "Google login failed"));
 });

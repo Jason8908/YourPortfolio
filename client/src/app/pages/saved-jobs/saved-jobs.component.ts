@@ -5,6 +5,7 @@ import { JobPreviewComponent } from '../../components/job-preview/job-preview.co
 import { JobDescriptionComponent } from '../../components/job-description/job-description.component';
 import { ApiService } from '../../services/api.service';
 import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-saved-jobs',
@@ -26,6 +27,8 @@ export class SavedJobsComponent {
   public pageIndex: number = 0;
   public length: number = 0;
   public pageEvent: any;
+  triggerCreditsRefresh: Subject<void> = new Subject<void>();
+  balance: number = 0;
 
   constructor(private apiService: ApiService) {}
 
@@ -37,7 +40,6 @@ export class SavedJobsComponent {
     this.apiService
       .getSavedJobs(this.pageSize * this.pageIndex, this.pageSize)
       .subscribe((res) => {
-        console.log(res);
         this.savedJobs = res.data.jobs.map((job: { Job: any }) => job.Job);
         this.savedJobs.forEach((job: { saved: boolean }) => {
           job.saved = true;
@@ -46,6 +48,10 @@ export class SavedJobsComponent {
         this.currentJob = this.savedJobs[0];
         this.length = res.data.totalCount;
       });
+  }
+
+  onAIReturn() {
+    this.triggerCreditsRefresh.next();
   }
 
   ngOnInit() {
@@ -58,5 +64,9 @@ export class SavedJobsComponent {
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
     this.getJobs();
+  }
+
+  updateBalance(newBalance: number) {
+    this.balance = newBalance;
   }
 }

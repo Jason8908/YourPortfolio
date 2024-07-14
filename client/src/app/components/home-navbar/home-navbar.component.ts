@@ -18,25 +18,32 @@ import { NgIf } from '@angular/common';
     MatIconModule,
     MatMenuModule,
     RouterModule,
-    NgIf
+    NgIf,
   ],
   templateUrl: './home-navbar.component.html',
-  styleUrl: './home-navbar.component.css'
+  styleUrl: './home-navbar.component.css',
 })
 export class HomeNavbarComponent {
   @Input() isAuth: boolean = false;
-  onAuthChange = output<boolean>()
-  constructor(private cookieService: CookieService, private router: Router, private apiService: ApiService) {}
+  onAuthChange = output<boolean>();
+  constructor(
+    private cookieService: CookieService,
+    private router: Router,
+    private apiService: ApiService,
+  ) {}
   ngOnInit() {
-    this.apiService.getUserInfo().subscribe(() => {
-      this.isAuth = true;
-      this.emitAuthChange(this.isAuth);
-    }, (error) => {
-      this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
-      console.log(error);
-      this.isAuth = false;
-      this.emitAuthChange(this.isAuth);
-    });
+    this.apiService.getUserInfo().subscribe(
+      () => {
+        this.isAuth = true;
+        this.emitAuthChange(this.isAuth);
+      },
+      (error) => {
+        this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
+        console.log(error);
+        this.isAuth = false;
+        this.emitAuthChange(this.isAuth);
+      },
+    );
   }
   signOut() {
     this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');

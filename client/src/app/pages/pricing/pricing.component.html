@@ -1,0 +1,5 @@
+<app-auth-header (onBalanceChange)="updateBalance($event)"></app-auth-header>
+<div class="pricing-wrapper">
+  <app-user-balance [balance]="balance"></app-user-balance>
+  <app-topup-options></app-topup-options>
+</div>

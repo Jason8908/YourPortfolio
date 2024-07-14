@@ -14,7 +14,7 @@ export const UserJob = sequelize.define(
 
 User.belongsToMany(Job, { through: UserJob });
 Job.belongsToMany(User, { through: UserJob });
-UserJob.belongsTo(Job)
-UserJob.belongsTo(User)
-User.hasMany(UserJob)
-Job.hasMany(UserJob)
+UserJob.belongsTo(Job);
+UserJob.belongsTo(User);
+User.hasMany(UserJob);
+Job.hasMany(UserJob);
