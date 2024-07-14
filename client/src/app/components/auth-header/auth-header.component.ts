@@ -32,7 +32,7 @@ export class AuthHeaderComponent {
   constructor(
     private apiService: ApiService,
     private cookieService: CookieService,
-    private router: Router,
+    private router: Router
   ) {}
 
   getBearerToken() {
@@ -63,7 +63,7 @@ export class AuthHeaderComponent {
       (error) => {
         console.log(`Error with the API: ${JSON.stringify(error)}`);
         this.router.navigate(['']);
-      },
+      }
     );
 
     this.apiService.getUserBalance().subscribe(
@@ -73,7 +73,7 @@ export class AuthHeaderComponent {
       (error) => {
         console.log(`Error with the API: ${JSON.stringify(error)}`);
         this.router.navigate(['']);
-      },
+      }
     );
 
     if (this.triggerCreditsRefresh) {
@@ -85,7 +85,7 @@ export class AuthHeaderComponent {
           (error) => {
             console.log(`Error with the API: ${JSON.stringify(error)}`);
             this.router.navigate(['']);
-          },
+          }
         );
       });
     }

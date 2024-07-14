@@ -6,9 +6,11 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgFor } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-topup-options',
@@ -21,25 +23,32 @@ import { MatButtonModule } from '@angular/material/button';
     NgFor,
     MatIconModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
+    CommonModule,
   ],
   templateUrl: './topup-options.component.html',
   styleUrl: './topup-options.component.css',
 })
 export class TopupOptionsComponent {
   options: Array<TopUpOption> = [];
+  public loading: boolean = true;
   constructor(
     private apiService: ApiService,
     private router: Router,
+    private snackbar: MatSnackBar
   ) {}
   ngOnInit() {
+    this.loading = true;
     this.apiService.getTopUpOptions().subscribe(
       (response) => {
         this.options = response.data;
+        this.loading = false;
       },
       (error) => {
         console.log(`Error fetching topup options: ${JSON.stringify(error)}`);
-        this.router.navigate(['']);
-      },
+        this.snackbar.open('Error fetching topup options', 'OK');
+        this.router.navigate(['dashboard']);
+      }
     );
   }
   purchaseTopup(option: TopUpOption) {
@@ -51,9 +60,10 @@ export class TopupOptionsComponent {
       },
       (error) => {
         console.log(
-          `Error creating checkout session: ${JSON.stringify(error)}`,
+          `Error creating checkout session: ${JSON.stringify(error)}`
         );
-      },
+        this.snackbar.open('Error creating checkout session', 'OK');
+      }
     );
   }
 }

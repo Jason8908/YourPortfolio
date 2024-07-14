@@ -15,6 +15,7 @@ import { User } from '../../classes/user';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-experiences',
@@ -41,21 +42,27 @@ export class UserExperiencesComponent {
     private apiService: ApiService,
     private localStorage: LocalStorageService,
     private router: Router,
+    private snackbar: MatSnackBar
   ) {
     this.user = this.localStorage.getUser();
   }
 
   updateUserExperiences(): any {
     if (!this.user) return this.router.navigate(['']);
-    this.apiService.getUserExperiences(this.user.id).subscribe((response) => {
-      const result = response.data as ExperienceList;
-      this.experiences = result.experiences;
-      for (const experience of this.experiences) {
-        experience.startDate = new Date(experience.startDate);
-        if (experience.endDate) {
-          experience.endDate = new Date(experience.endDate);
+    this.apiService.getUserExperiences(this.user.id).subscribe({
+      next: (response) => {
+        const result = response.data as ExperienceList;
+        this.experiences = result.experiences;
+        for (const experience of this.experiences) {
+          experience.startDate = new Date(experience.startDate);
+          if (experience.endDate) {
+            experience.endDate = new Date(experience.endDate);
+          }
         }
-      }
+      },
+      error: (err) => {
+        this.snackbar.open(`Error: Could not update user experience`, 'OK');
+      },
     });
   }
 
@@ -74,7 +81,8 @@ export class UserExperiencesComponent {
         },
         (error) => {
           console.log(`Error adding user experience: ${JSON.stringify(error)}`);
-        },
+          this.snackbar.open(`Error adding user experience`, `OK`);
+        }
       );
     });
   }
@@ -91,8 +99,11 @@ export class UserExperiencesComponent {
           this.updateUserExperiences();
         },
         (error) => {
-          console.log(`Error adding user experience: ${JSON.stringify(error)}`);
-        },
+          console.log(
+            `Error updating user experience: ${JSON.stringify(error)}`
+          );
+          this.snackbar.open(`Error updating user experience`, `OK`);
+        }
       );
     });
   }
@@ -113,9 +124,10 @@ export class UserExperiencesComponent {
             },
             (error) => {
               console.log(
-                `Error deleting user experience: ${JSON.stringify(error)}`,
+                `Error deleting user experience: ${JSON.stringify(error)}`
               );
-            },
+              this.snackbar.open(`Error deleting user experience`, `OK`);
+            }
           );
       }
     });

@@ -29,7 +29,7 @@ export class HomeNavbarComponent {
   constructor(
     private cookieService: CookieService,
     private router: Router,
-    private apiService: ApiService,
+    private apiService: ApiService
   ) {}
   ngOnInit() {
     this.apiService.getUserInfo().subscribe(
@@ -42,7 +42,7 @@ export class HomeNavbarComponent {
         console.log(error);
         this.isAuth = false;
         this.emitAuthChange(this.isAuth);
-      },
+      }
     );
   }
   signOut() {

@@ -11,7 +11,7 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
   const pageParam = page ? `&start=${page * 10}` : "";
 
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     defaultViewport: {
       width: 1280,

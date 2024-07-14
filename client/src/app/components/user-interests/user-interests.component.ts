@@ -13,6 +13,7 @@ import { AddInterestDialogComponent } from '../add-interest-dialog/add-interest-
 import { ApiService } from '../../services/api.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-interests',
@@ -37,15 +38,21 @@ export class UserInterestsComponent {
     private localStorage: LocalStorageService,
     private router: Router,
     private apiService: ApiService,
+    private snackbar: MatSnackBar
   ) {
     this.user = this.localStorage.getUser();
   }
 
   updateInterests(): any {
     if (!this.user) return this.router.navigate(['']);
-    this.apiService.getUserInterests(this.user.id).subscribe((response) => {
-      const result = response.data as InterestList;
-      this.interests = result.interests;
+    this.apiService.getUserInterests(this.user.id).subscribe({
+      next: (response) => {
+        const result = response.data as InterestList;
+        this.interests = result.interests;
+      },
+      error: (err) => {
+        this.snackbar.open('Error Updating intrest', 'OK');
+      },
     });
   }
 
@@ -57,11 +64,14 @@ export class UserInterestsComponent {
     if (!this.user) this.router.navigate(['']);
     let dialogRef = this.dialog.open(AddInterestDialogComponent);
     dialogRef.afterClosed().subscribe((result) => {
-      this.apiService
-        .addUserInterest(this.user!.id, result)
-        .subscribe((response) => {
+      this.apiService.addUserInterest(this.user!.id, result).subscribe({
+        next: (response) => {
           this.updateInterests();
-        });
+        },
+        error: (err) => {
+          this.snackbar.open('Error Adding intrest', 'OK');
+        },
+      });
     });
   }
 
@@ -73,11 +83,14 @@ export class UserInterestsComponent {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
-      this.apiService
-        .deleteUserInterest(this.user!.id, interestId)
-        .subscribe((response) => {
+      this.apiService.deleteUserInterest(this.user!.id, interestId).subscribe({
+        next: (response) => {
           this.updateInterests();
-        });
+        },
+        error: (err) => {
+          this.snackbar.open('Error deleting intrest', 'OK');
+        },
+      });
     });
   }
 }

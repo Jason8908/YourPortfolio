@@ -47,6 +47,8 @@ export class JobSearchComponent {
   }
 
   ngOnInit() {
-    this.jobSearch.setValue(this.formValues);
+    if (this.formValues.query) {
+      this.jobSearch.setValue(this.formValues);
+    }
   }
 }

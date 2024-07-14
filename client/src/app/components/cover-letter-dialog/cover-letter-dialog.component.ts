@@ -2,7 +2,6 @@ import { Component, inject, Inject, model, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
-import { ApiService } from '../../services/api.service';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { TransmitCreditsData } from '../../classes/transmit-credits-data';

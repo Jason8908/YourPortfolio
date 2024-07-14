@@ -4,7 +4,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -22,9 +21,4 @@ import { Router } from '@angular/router';
 })
 export class UserBalanceComponent {
   @Input() balance: number = 0;
-  constructor(
-    private apiService: ApiService,
-    private router: Router,
-  ) {}
-  ngOnInit() {}
 }

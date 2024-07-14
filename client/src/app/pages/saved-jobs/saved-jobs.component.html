@@ -15,30 +15,39 @@
 >
 </mat-paginator>
 
-<div class="saved-container">
-  <div *ngIf="savedJobs.length > 0; else showNothing" class="row job-container">
-    <div class="col-4">
-      <app-job-preview
-        *ngFor="let jobData of savedJobs"
-        [jobData]="jobData"
-        (click)="setItem(jobData.id)"
-      >
-      </app-job-preview>
-    </div>
-    <div class="col-8">
-      <app-job-description
-        [jobData]="currentJob"
-        class="job-description-container"
-        [balance]="balance"
-        (onAIReturn)="onAIReturn()"
-      >
-      </app-job-description>
-    </div>
-  </div>
-
-  <ng-template #showNothing>
-    <div class="no-results">
-      <i>No jobs saved</i>
-    </div>
-  </ng-template>
+<div class="spinner" *ngIf="loading; else showResults">
+  <mat-spinner></mat-spinner>
 </div>
+
+<ng-template #showResults>
+  <div class="saved-container">
+    <div
+      *ngIf="savedJobs.length > 0; else showNothing"
+      class="row job-container"
+    >
+      <div class="col-4">
+        <app-job-preview
+          *ngFor="let jobData of savedJobs"
+          [jobData]="jobData"
+          (click)="setItem(jobData.id)"
+        >
+        </app-job-preview>
+      </div>
+      <div class="col-8">
+        <app-job-description
+          [jobData]="currentJob"
+          class="job-description-container"
+          [balance]="balance"
+          (onAIReturn)="onAIReturn()"
+        >
+        </app-job-description>
+      </div>
+    </div>
+
+    <ng-template #showNothing>
+      <div class="no-results">
+        <i>No jobs saved</i>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>

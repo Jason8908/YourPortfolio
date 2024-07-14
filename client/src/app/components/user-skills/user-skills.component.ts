@@ -40,7 +40,7 @@ export class UserSkillsComponent {
     private apiService: ApiService,
     private localStorage: LocalStorageService,
     private router: Router,
-    private snackBar: MatSnackBar,
+    private snackBar: MatSnackBar
   ) {
     this.user = this.localStorage.getUser();
   }
@@ -71,7 +71,8 @@ export class UserSkillsComponent {
         },
         (error) => {
           console.log(`Error with the API: ${JSON.stringify(error)}`);
-        },
+          this.snackBar.open(`Error retrieving skills`, 'OK');
+        }
       );
     }
   }
@@ -98,12 +99,14 @@ export class UserSkillsComponent {
           },
           (error) => {
             console.log(`Error with the API: ${JSON.stringify(error)}`);
-          },
+            this.snackBar.open(`Error when deleting skill`, 'OK');
+          }
         );
       },
       (error) => {
         console.log(`Error with the dialog: ${JSON.stringify(error)}`);
-      },
+        this.snackBar.open(`Error when deleting skill`, 'OK');
+      }
     );
   }
 
@@ -120,7 +123,8 @@ export class UserSkillsComponent {
             },
             (error) => {
               console.log(`Error with the API: ${JSON.stringify(error)}`);
-            },
+              this.snackBar.open(`Error when adding skill`, 'OK');
+            }
           );
         } else if (typeof result === 'number') {
           // If the result is a number, then call addUserSkill.
@@ -130,18 +134,20 @@ export class UserSkillsComponent {
             },
             (error) => {
               if (error.status === 409) {
-                this.snackBar.open('You already have that skill!', 'Close', {
-                  duration: 2000,
+                this.snackBar.open('You already have that skill!', 'OK', {
+                  duration: 5000,
                 });
               } else
                 console.log(`Error with the API: ${JSON.stringify(error)}`);
-            },
+              this.snackBar.open(`Error adding skill`, 'OK');
+            }
           );
         }
       },
       (error) => {
         console.log(`Error with the dialog: ${JSON.stringify(error)}`);
-      },
+        this.snackBar.open(`Error adding skill`, 'OK');
+      }
     );
   }
 }

@@ -19,6 +19,7 @@ import { Skill, SkillList } from '../../classes/skills';
 import { ApiService } from '../../services/api.service';
 import { Observable } from 'rxjs';
 import { AddSkillDialogData } from '../../classes/add-skill-dialog-data';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-add-skill-dialog',
@@ -48,7 +49,7 @@ export class AddSkillDialogComponent {
   control = new FormControl('');
   skillOptions: Observable<Skill[]> = new Observable<Skill[]>();
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
 
   resetApiTimeout() {
     if (!this.timeoutFunction) return;
@@ -68,14 +69,19 @@ export class AddSkillDialogComponent {
   updateSkillOptions(searchQuery: string | null) {
     if (!searchQuery) return this.setBlankSkillOptions();
     this.lastSearched = searchQuery;
-    this.apiService.getSkills(searchQuery).subscribe((response) => {
-      const result = response.data as SkillList;
-      this.skillOptions = new Observable<Skill[]>((observer) => {
-        observer.next(result.skills);
-      });
-      this.skillNameToId = {};
-      for (const skill of result.skills)
-        this.skillNameToId[skill.name] = skill.id;
+    this.apiService.getSkills(searchQuery).subscribe({
+      next: (response) => {
+        const result = response.data as SkillList;
+        this.skillOptions = new Observable<Skill[]>((observer) => {
+          observer.next(result.skills);
+        });
+        this.skillNameToId = {};
+        for (const skill of result.skills)
+          this.skillNameToId[skill.name] = skill.id;
+      },
+      error: (err) => {
+        this.snackbar.open(`Error: ${err.message}`, 'OK');
+      },
     });
   }
 

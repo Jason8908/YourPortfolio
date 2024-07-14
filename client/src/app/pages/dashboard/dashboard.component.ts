@@ -26,7 +26,7 @@ export class DashboardComponent {
   user: User = {} as User;
   constructor(
     private router: Router,
-    private localStorage: LocalStorageService,
+    private localStorage: LocalStorageService
   ) {}
 
   onSearch(search: JobSearchRequest) {
@@ -38,9 +38,9 @@ export class DashboardComponent {
     });
   }
 
-  ngOnInit() {
-    const user = this.localStorage.getUser();
-    if (!user) this.router.navigate(['']);
-    this.user = user as User;
-  }
+  // ngOnInit() {
+  //   const user = this.localStorage.getUser();
+  //   if (!user) this.router.navigate(['']);
+  //   this.user = user as User;
+  // }
 }

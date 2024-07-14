@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-jobs',
@@ -21,6 +22,7 @@ import { Subject } from 'rxjs';
     CommonModule,
     JobDescriptionComponent,
     JobSearchComponent,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './jobs.component.html',
   styleUrl: './jobs.component.css',
@@ -32,12 +34,13 @@ export class JobsComponent {
   balance: number = 0;
   readonly dialog = inject(MatDialog);
   public currentQuery: any;
+  public loading: boolean = true;
   triggerCreditsRefresh: Subject<void> = new Subject<void>();
   constructor(
     private apiService: ApiService,
     private snackBar: MatSnackBar,
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router
   ) {
     this.currentQuery = {};
   }
@@ -46,26 +49,26 @@ export class JobsComponent {
     this.triggerCreditsRefresh.next();
   }
 
-  showSpinner() {
-    if (this.spinnerRef) return;
-    this.spinnerRef = this.dialog.open(SpinnerDialogComponent, {
-      height: '150px',
-      width: '150px',
-    });
-  }
+  // showSpinner() {
+  //   if (this.spinnerRef) return;
+  //   this.spinnerRef = this.dialog.open(SpinnerDialogComponent, {
+  //     height: '150px',
+  //     width: '150px',
+  //   });
+  // }
 
-  hideSpinner() {
-    if (!this.spinnerRef) return;
-    this.spinnerRef.close();
-    this.spinnerRef = null;
-  }
+  // hideSpinner() {
+  //   if (!this.spinnerRef) return;
+  //   this.spinnerRef.close();
+  //   this.spinnerRef = null;
+  // }
 
   setItem(newId: number) {
     this.currentJob = this.jobSearchResult.find((job) => job.id == newId);
   }
 
   onSearch(search: JobSearchRequest) {
-    this.showSpinner();
+    this.loading = true;
     this.apiService.getJobs(search).subscribe({
       next: (res) => {
         this.jobSearchResult = res.data;
@@ -73,11 +76,11 @@ export class JobsComponent {
           job.saved = job.UserJobs?.length > 0;
         });
         this.currentJob = this.jobSearchResult[0];
-        this.hideSpinner();
+        this.loading = false;
       },
       error: (err) => {
-        this.hideSpinner();
-        this.snackBar.open(err.toString(), 'OK');
+        this.loading = false;
+        this.snackBar.open('Error retreiving jobs', 'OK');
       },
     });
   }

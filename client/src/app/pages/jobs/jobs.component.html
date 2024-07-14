@@ -11,31 +11,37 @@
   ></app-job-search>
 </div>
 
-<div
-  *ngIf="jobSearchResult.length > 0; else showNothing"
-  class="row job-container"
->
-  <div class="col-4">
-    <app-job-preview
-      *ngFor="let jobData of jobSearchResult"
-      [jobData]="jobData"
-      (click)="setItem(jobData.id)"
-    >
-    </app-job-preview>
-  </div>
-  <div class="col-8">
-    <app-job-description
-      [jobData]="currentJob"
-      class="job-description-container"
-      [balance]="balance"
-      (onAIReturn)="onAIReturn()"
-    >
-    </app-job-description>
-  </div>
+<div *ngIf="loading; else showResult" class="spinner">
+  <mat-spinner></mat-spinner>
 </div>
 
-<ng-template #showNothing>
-  <div class="no-results">
-    <i>No results found</i>
+<ng-template #showResult>
+  <div
+    class="row job-container"
+    *ngIf="jobSearchResult.length > 0; else showNothing"
+  >
+    <div class="col-4">
+      <app-job-preview
+        *ngFor="let jobData of jobSearchResult"
+        [jobData]="jobData"
+        (click)="setItem(jobData.id)"
+      >
+      </app-job-preview>
+    </div>
+    <div class="col-8">
+      <app-job-description
+        [jobData]="currentJob"
+        class="job-description-container"
+        [balance]="balance"
+        (onAIReturn)="onAIReturn()"
+      >
+      </app-job-description>
+    </div>
   </div>
+
+  <ng-template #showNothing>
+    <div class="no-results">
+      <i>No results found</i>
+    </div>
+  </ng-template>
 </ng-template>

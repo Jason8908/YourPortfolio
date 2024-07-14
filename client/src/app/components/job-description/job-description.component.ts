@@ -45,10 +45,7 @@ export class JobDescriptionComponent {
     saved: false,
   };
   @Output() onAIReturn = new EventEmitter<void>();
-  constructor(
-    private apiService: ApiService,
-    private snackbar: MatSnackBar,
-  ) {}
+  constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
   ngOnInit() {
     console.log(this.balance);
   }
@@ -88,20 +85,30 @@ export class JobDescriptionComponent {
   }
 
   saveJob(jobId: number) {
-    this.apiService.saveJob(jobId).subscribe((res) => {
-      this.jobData.saved = true;
-      this.snackbar.open('Job Saved!', 'OK', {
-        duration: 5000,
-      });
+    this.apiService.saveJob(jobId).subscribe({
+      next: (res) => {
+        this.jobData.saved = true;
+        this.snackbar.open('Job Saved!', 'OK', {
+          duration: 5000,
+        });
+      },
+      error: (err) => {
+        this.snackbar.open(`Error: ${err.message}`, 'OK');
+      },
     });
   }
 
   unsaveJob(jobId: number) {
-    this.apiService.unsaveJob(jobId).subscribe((res) => {
-      this.jobData.saved = false;
-      this.snackbar.open('Job Unsaved!', 'OK', {
-        duration: 5000,
-      });
+    this.apiService.unsaveJob(jobId).subscribe({
+      next: (res) => {
+        this.jobData.saved = false;
+        this.snackbar.open('Job Unsaved!', 'OK', {
+          duration: 5000,
+        });
+      },
+      error: (err) => {
+        this.snackbar.open(`Error: ${err.message}`, 'OK');
+      },
     });
   }
 }
