@@ -1,14 +1,8 @@
-<app-auth-header
-  (onBalanceChange)="updateBalance($event)"
-  [triggerCreditsRefresh]="triggerCreditsRefresh"
->
+<app-auth-header (onBalanceChange)="updateBalance($event)" [triggerCreditsRefresh]="triggerCreditsRefresh">
 </app-auth-header>
 
 <div class="job-search-center">
-  <app-job-search
-    [formValues]="currentQuery"
-    (newSearch)="onSearch($event)"
-  ></app-job-search>
+  <app-job-search [formValues]="currentQuery" (newSearch)="onSearch($event)"></app-job-search>
 </div>
 
 <div *ngIf="loading; else showResult" class="spinner">
@@ -16,25 +10,16 @@
 </div>
 
 <ng-template #showResult>
-  <div
-    class="row job-container"
-    *ngIf="jobSearchResult.length > 0; else showNothing"
-  >
+  <div class="row job-container" *ngIf="jobSearchResult.length > 0; else showNothing">
     <div class="col-4">
-      <app-job-preview
-        *ngFor="let jobData of jobSearchResult"
-        [jobData]="jobData"
-        (click)="setItem(jobData.id)"
-      >
-      </app-job-preview>
+      <div *ngFor="let jobData of jobSearchResult">
+        <app-job-preview [jobData]="jobData" (click)="setItem(jobData.id)">
+        </app-job-preview>
+      </div>
     </div>
     <div class="col-8">
-      <app-job-description
-        [jobData]="currentJob"
-        class="job-description-container"
-        [balance]="balance"
-        (onAIReturn)="onAIReturn()"
-      >
+      <app-job-description [jobData]="currentJob" class="job-description-container" [balance]="balance"
+        (onAIReturn)="onAIReturn()">
       </app-job-description>
     </div>
   </div>
