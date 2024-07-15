@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Generate Cover Letter</h2>
+<mat-dialog-content class="mat-typography">
+  <h3>Select AI Model</h3>
+  <mat-radio-group [(ngModel)]="selectedAIModel">
+    <mat-radio-button [value]="aiModels.Gemini15Flash" [checked]="true"
+      >Google Gemini 1.5 Flash</mat-radio-button
+    >
+    <mat-radio-button
+      [value]="aiModels.Gemini15Pro"
+      [disabled]="!data.credits || data.credits < 1"
+      >Google Gemini 1.5 Pro (1 credit)</mat-radio-button
+    >
+  </mat-radio-group>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false" cdkFocusInitial>Cancel</button>
+  <button mat-button [mat-dialog-close]="selectedAIModel()">Confirm</button>
+</mat-dialog-actions>

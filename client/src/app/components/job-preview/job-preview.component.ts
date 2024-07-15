@@ -4,6 +4,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { CommonModule } from '@angular/common';
 import { MatRipple } from '@angular/material/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-job-preview',
@@ -14,6 +16,8 @@ import { MatRipple } from '@angular/material/core';
     MatProgressBarModule,
     MatChipsModule,
     MatRipple,
+    MatButtonModule,
+    MatIconModule,
   ],
   templateUrl: './job-preview.component.html',
   styleUrl: './job-preview.component.css',

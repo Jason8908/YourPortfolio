@@ -1,5 +1,13 @@
 <app-auth-header></app-auth-header>
-<p>Welcome, {{user.firstName}} {{user.lastName}}</p>
+<!-- <p>Welcome, {{ user.firstName }} {{ user.lastName }}</p>
 <nav>
-    <a routerLink="/dashboard/jobs">View Jobs</a>
-</nav>
+  <a routerLink="/dashboard/jobs">View Jobs</a>
+</nav> -->
+<div class="dashboard-container">
+  <h1>Find Your Next Job</h1>
+  <mat-card>
+    <div class="card-padding">
+      <app-job-search (newSearch)="onSearch($event)"></app-job-search>
+    </div>
+  </mat-card>
+</div>

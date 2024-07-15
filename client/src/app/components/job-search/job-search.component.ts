@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -8,7 +8,8 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
-import { JobSearchRequest } from '../../models/jobSearch';
+import { JobSearchRequest } from '../../classes/jobSearch';
+import { query } from '@angular/animations';
 
 @Component({
   selector: 'app-job-search',
@@ -24,6 +25,10 @@ import { JobSearchRequest } from '../../models/jobSearch';
   styleUrl: './job-search.component.css',
 })
 export class JobSearchComponent {
+  @Input() formValues = {
+    query: undefined,
+    location: undefined,
+  };
   @Output() newSearch = new EventEmitter<JobSearchRequest>();
 
   jobSearch: FormGroup;
@@ -39,5 +44,11 @@ export class JobSearchComponent {
       query: this.jobSearch.value.query,
       location: this.jobSearch.value.location,
     });
+  }
+
+  ngOnInit() {
+    if (this.formValues.query) {
+      this.jobSearch.setValue(this.formValues);
+    }
   }
 }

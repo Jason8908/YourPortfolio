@@ -1,43 +1,40 @@
 import { Component } from '@angular/core';
 import { AuthHeaderComponent } from '../../components/auth-header/auth-header.component';
-import { CookieService } from 'ngx-cookie-service';
-import { ApiService } from '../../services/api.service';
+import { UserSkillsComponent } from '../../components/user-skills/user-skills.component';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { User } from '../../classes/user';
+import { LocalStorageService } from '../../services/local-storage.service';
+import { JobSearchComponent } from '../../components/job-search/job-search.component';
+import { MatCardModule } from '@angular/material/card';
+import { JobSearchRequest } from '../../classes/jobSearch';
+import { query } from '@angular/animations';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [AuthHeaderComponent, RouterModule],
+  imports: [
+    AuthHeaderComponent,
+    UserSkillsComponent,
+    RouterModule,
+    JobSearchComponent,
+    MatCardModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent {
   user: User = {} as User;
   constructor(
-    private cookieService: CookieService,
-    private apiService: ApiService,
-    private router: Router
+    private router: Router,
+    private localStorage: LocalStorageService
   ) {}
 
-  ngOnInit() {
-    // Getting the user's information from the API.
-    this.apiService.getUserInfo().subscribe(
-      (response) => {
-        this.user = response.data;
-        console.log(this.user);
+  onSearch(search: JobSearchRequest) {
+    this.router.navigate([`dashboard/jobs`], {
+      queryParams: {
+        query: search.query,
+        location: search.location,
       },
-      (error) => {
-        console.log(`Error with the API: ${error}`);
-        this.router.navigate(['']);
-      }
-    );
+    });
   }
-}
-
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
 }

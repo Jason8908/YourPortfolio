@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, output } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Router, RouterModule } from '@angular/router';
@@ -6,6 +6,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { User } from '../../classes/user';
+import { CookieLabels } from '../../app.constants';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-auth-header',
@@ -21,7 +24,10 @@ import { MatMenuModule } from '@angular/material/menu';
   styleUrl: './auth-header.component.css',
 })
 export class AuthHeaderComponent {
-  user: any;
+  user: User = {} as User;
+  balance: number = 0;
+  onBalanceChange = output<number>();
+  @Input() triggerCreditsRefresh: Observable<void> | undefined;
 
   constructor(
     private apiService: ApiService,
@@ -30,12 +36,17 @@ export class AuthHeaderComponent {
   ) {}
 
   getBearerToken() {
-    return this.cookieService.get('bearerToken');
+    return this.cookieService.get(CookieLabels.AUTH_TOKEN);
   }
 
   signOut() {
-    this.cookieService.delete('bearerToken');
-    this.router.navigate([''], { queryParams: { signOut: 'true' } });
+    this.cookieService.delete(CookieLabels.AUTH_TOKEN, '/');
+    this.router.navigate(['']);
+  }
+
+  setNewBalance(newBalance: number) {
+    this.balance = newBalance;
+    this.onBalanceChange.emit(this.balance);
   }
 
   ngOnInit() {
@@ -47,13 +58,36 @@ export class AuthHeaderComponent {
 
     this.apiService.getUserInfo().subscribe(
       (response) => {
-        this.user = response.data;
-        console.log(this.user);
+        this.user = response.data as User;
       },
       (error) => {
-        console.log(`Error with the API: ${error}`);
+        console.log(`Error with the API: ${JSON.stringify(error)}`);
         this.router.navigate(['']);
       }
     );
+
+    this.apiService.getUserBalance().subscribe(
+      (response) => {
+        this.setNewBalance(response.data.credits);
+      },
+      (error) => {
+        console.log(`Error with the API: ${JSON.stringify(error)}`);
+        this.router.navigate(['']);
+      }
+    );
+
+    if (this.triggerCreditsRefresh) {
+      this.triggerCreditsRefresh.subscribe(() => {
+        this.apiService.getUserBalance().subscribe(
+          (response) => {
+            this.setNewBalance(response.data.credits);
+          },
+          (error) => {
+            console.log(`Error with the API: ${JSON.stringify(error)}`);
+            this.router.navigate(['']);
+          }
+        );
+      });
+    }
   }
 }

@@ -1,6 +1,9 @@
-.form-fields{
-    display: flex;
-    /* align-content: center;
+.form-fields {
+  display: flex;
+  /* align-content: center;
     align-items: center; */
-    gap: 10px;
+  gap: 10px;
+}
+.button-container {
+  padding-top: 8px;
 }

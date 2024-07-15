@@ -1,0 +1,21 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Skills</mat-card-title>
+  </mat-card-header>
+  <mat-card-actions>
+    <button mat-button (click)="addSkill()">
+      Add Skill
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-card-actions>
+  <mat-card-content>
+    <mat-chip-set>
+      <mat-chip *ngFor="let skill of skills"
+        >{{ skill.name }}
+        <button matChipRemove (click)="deleteSkill(skill.id)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-chip>
+    </mat-chip-set>
+  </mat-card-content>
+</mat-card>

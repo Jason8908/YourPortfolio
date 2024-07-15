@@ -7,8 +7,8 @@ import {
 } from '@abacritt/angularx-social-login';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 const googleLoginOptions: GoogleInitOptions = {
   scopes: [
@@ -20,13 +20,13 @@ const googleLoginOptions: GoogleInitOptions = {
 const googleProvider = {
   provide: 'SocialAuthServiceConfig',
   useValue: {
-    autoLogin: true,
+    autoLogin: false,
     providers: [
       {
         id: GoogleLoginProvider.PROVIDER_ID,
         provider: new GoogleLoginProvider(
           '306926403104-fc62u100r760gct7de9hr3na6k83p0lj.apps.googleusercontent.com',
-          googleLoginOptions
+          googleLoginOptions,
         ),
       },
     ],
@@ -42,6 +42,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     googleProvider,
     provideHttpClient(),
-    CookieService, provideAnimationsAsync(), provideAnimationsAsync()
+    provideAnimationsAsync(),
+    provideAnimationsAsync(),
+    provideNativeDateAdapter(),
   ],
 };

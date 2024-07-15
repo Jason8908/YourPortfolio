@@ -15,17 +15,13 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
 - YourPortfolio will find jobs with matching your portfolio, and generate catered resumes and cover letters for the specific job.
 
-- The application will also provide job posting recommendations for the user and allow the user to upload created resumes and cover letters to Google Drive for storage.
-
-- The user will be able to create Job Alerts with certain criteria and they will receive emails containing a batch of jobs that match their criteria.
-
 ## Bullet points outlining how to fulfil "Required Elements"
 
 - The application will use Angular
 
 - The application's API is RESTful where appropriate
 
-- The application will be deployed on a Virtual Machine using Docker and Docker Compose
+- The application will be deployed on a Virtual Machine using Docker and Docker Compose.
 
 - We will commit all deployment files to Github, including CI files for building images.
 
@@ -41,9 +37,9 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
 ## Bullet points outlining how to fulfil "Additional Requirements"
 
-- Because users will be signed in using their Google accounts, a feature will be available to upload created cover letters and resumes to their Google Drive.
+- Stripe will be integrated to the application in order to support the purchase of "credits", which will allow users to make use of the more intelligent versions of the Google Gemini AI models.
 
-- The SendGrid webhook will be used to send emails to users periodically once there are job postings that match the filters in their created job alerts.
+- The stripe webhook will be used to listen for successful transasctions and will update the user's credits accordingly once observed.
 
 - Generating Resume and Cover Letters with AI is a long-running task.
 
@@ -53,16 +49,14 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
 - Users are able to log in
 - Users can upload skills, experience and intrests to their profile
-- Users can view Elligible Job Postings based on their Profile
+- Users can view and search for Job Postings
 - Users can generate resumes/cover letters based on the job description itself
 - Website is purely functional, with minimal styles
 
 ### Beta Milestones
 
 - Website has proper styling and looks modern
-- Website is reponsive to mobile devices
 - Users can click a button next to each job posting to easily create a cover letter or resume for that job
-- Resumes and Cover Letters are uploaded to Google Drive after creation
 
 ### Final version
 

@@ -1,0 +1,42 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Work/Volunteer Experience</mat-card-title>
+  </mat-card-header>
+  <mat-card-actions>
+    <button mat-button (click)="addExperience()">
+      Add Experience
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-card-actions>
+  <mat-card-content>
+    <mat-accordion>
+      <mat-expansion-panel hideToggle *ngFor="let exp of experiences">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ exp.position }} &#64; {{ exp.company }}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ formatDate(exp.startDate) }} &#8212;
+            {{
+              exp.endDate ? formatDate(exp.endDate) : "Present"
+            }}</mat-panel-description
+          >
+          <button mat-icon-button (click)="updateExperience(exp)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteExperience(exp.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-expansion-panel-header>
+        <div>
+          <p *ngIf="exp.description">
+            {{ exp.description }}
+          </p>
+          <p *ngIf="!exp.description">
+            <i> No Description Provided </i>
+          </p>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-card-content>
+</mat-card>

@@ -1,21 +1,24 @@
 <mat-toolbar color="primary" class="navbar">
-    <span>YourPortfolio</span>
-    <a mat-button routerLink="/dashboard">Home</a>
-    <a mat-button routerLink="/dashboard/jobs">Jobs</a>
-    <a mat-button>Applications</a>
-    <span class="spacer"></span>
-    <button mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon>account_circle</mat-icon>
+  <span>YourPortfolio</span>
+  <a mat-button routerLink="/dashboard">Home</a>
+  <a mat-button routerLink="/dashboard/profile">My Profile</a>
+  <a mat-button routerLink="/dashboard/saved">Saved Jobs</a>
+  <span class="spacer"></span>
+  <a mat-button routerLink="/dashboard/pricing">
+    <mat-icon>payments</mat-icon>
+    <span>{{ balance.toFixed(2) }}</span>
+  </a>
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/dashboard/settings">
+      <mat-icon>settings</mat-icon>
+      <span>Account</span>
     </button>
-    <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="signOut()">
-            <mat-icon>logout</mat-icon>
-            <span>Sign Out</span>
-        </button>
-        <button mat-menu-item>
-            <mat-icon>settings</mat-icon>
-            <span>Settings</span>
-        </button>
-    </mat-menu>
-
+    <button mat-menu-item (click)="signOut()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </mat-menu>
 </mat-toolbar>
