@@ -44,8 +44,7 @@ export class UserInterestsComponent {
   }
 
   updateInterests(): any {
-    if (!this.user) return this.router.navigate(['']);
-    this.apiService.getUserInterests(this.user.id).subscribe({
+    this.apiService.getUserInterests().subscribe({
       next: (response) => {
         const result = response.data as InterestList;
         this.interests = result.interests;
@@ -61,10 +60,9 @@ export class UserInterestsComponent {
   }
 
   addInterest() {
-    if (!this.user) this.router.navigate(['']);
     let dialogRef = this.dialog.open(AddInterestDialogComponent);
     dialogRef.afterClosed().subscribe((result) => {
-      this.apiService.addUserInterest(this.user!.id, result).subscribe({
+      this.apiService.addUserInterest(result).subscribe({
         next: (response) => {
           this.updateInterests();
         },
@@ -83,7 +81,7 @@ export class UserInterestsComponent {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
-      this.apiService.deleteUserInterest(this.user!.id, interestId).subscribe({
+      this.apiService.deleteUserInterest(interestId).subscribe({
         next: (response) => {
           this.updateInterests();
         },

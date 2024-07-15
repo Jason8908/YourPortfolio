@@ -48,8 +48,7 @@ export class UserExperiencesComponent {
   }
 
   updateUserExperiences(): any {
-    if (!this.user) return this.router.navigate(['']);
-    this.apiService.getUserExperiences(this.user.id).subscribe({
+    this.apiService.getUserExperiences().subscribe({
       next: (response) => {
         const result = response.data as ExperienceList;
         this.experiences = result.experiences;
@@ -75,7 +74,7 @@ export class UserExperiencesComponent {
       width: '800px',
     });
     dialogRef.afterClosed().subscribe((result) => {
-      this.apiService.addUserExperience(this.user!.id, result).subscribe(
+      this.apiService.addUserExperience(result).subscribe(
         () => {
           this.updateUserExperiences();
         },
@@ -94,7 +93,7 @@ export class UserExperiencesComponent {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result == null) return;
-      this.apiService.updateUserExperience(this.user!.id, result).subscribe(
+      this.apiService.updateUserExperience(result).subscribe(
         () => {
           this.updateUserExperiences();
         },
@@ -117,7 +116,7 @@ export class UserExperiencesComponent {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.apiService
-          .deleteUserExperience(this.user!.id, experienceId)
+          .deleteUserExperience(experienceId)
           .subscribe(
             () => {
               this.updateUserExperiences();

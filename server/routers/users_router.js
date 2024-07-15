@@ -10,6 +10,7 @@ import { isAuthenticated, setUserId } from "../middleware/auth.js";
 import { UserExperience } from "../models/userexperiences.js";
 import { Op } from "sequelize";
 import { Balance } from "../models/balance.js";
+import { UserEducation } from "../models/usereducation.js";
 import "dotenv/config";
 import axios from "axios";
 export const usersRouter = Router();
@@ -110,47 +111,11 @@ usersRouter.post("/auth", async (req, res) => {
   );
 });
 
-const bulkDeleteUserSkills = async (userId, skills) => {
-  const skillIds = skills.map((skill) => skill.id);
-  return await UserSkill.destroy({
-    where: {
-      userId,
-      skillId: skillIds,
-    },
-  });
-};
-
-const bulkAddUserSkills = async (userId, skills) => {
-  const userSkills = skills.map((skill) => ({ userId, skillId: skill.id }));
-  return await UserSkill.bulkCreate(userSkills);
-};
-
-const bulkCreateAddUserSkills = async (userId, skills) => {
-  const toCreate = skills.map((skill) => ({ skillName: skill.name }));
-  const createdSkills = await Skill.bulkCreate(toCreate, { returning: true });
-  const toInsert = createdSkills.map((skill) => ({
-    userId,
-    skillId: skill.id,
-  }));
-  return await UserSkill.bulkCreate(toInsert);
-};
-
 // User skills
-usersRouter.get("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
+usersRouter.get("/skills", isAuthenticated, setUserId, async (req, res) => {
   const limit = req.query.limit || 10;
   const offset = req.query.offset || 0;
-  const userId = +req.params.id;
-  // Verify the user exists
-  const user = await User.findByPk(userId);
-  if (!user)
-    return res.status(404).json(new ApiResponse(404, "User not found."));
-  // Verify the user is the same as the one authenticated
-  if (userId != req.userId)
-    return res
-      .status(403)
-      .json(
-        new ApiResponse(403, "Forbidden: You can only view your own skills."),
-      );
+  const userId = req.userId;
   // Get the user's skills
   const results = await UserSkill.findAndCountAll({
     where: { userId },
@@ -167,94 +132,13 @@ usersRouter.get("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
   res.status(200).json(new ApiResponse(200, "", { totalCount, skills }));
 });
 
-usersRouter.put("/:id/skills", isAuthenticated, setUserId, async (req, res) => {
-  const skills = req.body.skills;
-  const userId = +req.params.id;
-  let toDelete = [],
-    toAdd = [],
-    toCreate = [];
-  // Verify the user exists
-  const user = await User.findByPk(userId);
-  if (!user)
-    return res.status(404).json(new ApiResponse(404, "User not found."));
-  // Verify the user is the same as the one authenticated
-  if (userId != req.userId)
-    return res
-      .status(403)
-      .json(
-        new ApiResponse(403, "Forbidden: You can only update your own skills."),
-      );
-  // Running validations on skills
-  if (!skills)
-    return res
-      .status(400)
-      .json(
-        new ApiResponse(
-          400,
-          "Missing information: Must provide a list of skills.",
-        ),
-      );
-  if (!Array.isArray(skills))
-    return res
-      .status(400)
-      .json(
-        new ApiResponse(400, "Invalid information: skills must be an array."),
-      );
-  // Check if all operations are either 'add' or 'remove'
-  for (const skill of skills) {
-    if (
-      skill.operation !== operations.Add &&
-      skill.operation !== operations.Remove
-    )
-      return res
-        .status(400)
-        .json(
-          new ApiResponse(
-            400,
-            "Invalid information: operation must be either 'add' or 'remove' for all skills.",
-          ),
-        );
-    if (skill.operation === operations.Add)
-      if (skill.id === undefined) toCreate.push(skill);
-      else toAdd.push(skill);
-    else toDelete.push(skill);
-  }
-  try {
-    await bulkDeleteUserSkills(userId, toDelete);
-    await bulkAddUserSkills(userId, toAdd);
-    await bulkCreateAddUserSkills(userId, toCreate);
-    const status = toAdd.length > 0 ? 201 : 200;
-    return res
-      .status(status)
-      .json(new ApiResponse(status, "Skills updated successfully."));
-  } catch (error) {
-    return res
-      .status(500)
-      .json(new ApiResponse(500, "Internal server error.", error.message));
-  }
-});
-
 usersRouter.delete(
-  "/:id/skills/:skillId",
+  "/skills/:skillId",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
     const skillId = +req.params.skillId;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only update your own skills.",
-          ),
-        );
+    const userId = req.userId;
     // Verify the skill exists
     const skill = await Skill.findByPk(skillId);
     if (!skill)
@@ -277,11 +161,11 @@ usersRouter.delete(
 );
 
 usersRouter.post(
-  "/:id/skills",
+  "/skills",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
+    const userId = req.userId;
     const skillName = req.body.skillName;
     let skillId = +(req.body.skillId !== undefined ? req.body.skillId : -1);
     // If the user has not provided a skill name or id
@@ -292,20 +176,6 @@ usersRouter.post(
           new ApiResponse(
             400,
             "Missing information: Must provide a skill name or id.",
-          ),
-        );
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only update your own skills.",
           ),
         );
     // If the skillId is not provided
@@ -345,31 +215,18 @@ usersRouter.post(
 // USER INTERESTS
 
 usersRouter.get(
-  "/:id/interests",
+  "/interests",
   isAuthenticated,
   setUserId,
   async (req, res) => {
     const limit = req.query.limit || 10;
     const offset = req.query.offset || 0;
-    const userId = +req.params.id;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only view your own interests.",
-          ),
-        );
+    const userId = req.userId;
     // Get the user's interests
     const results = await UserInterest.findAndCountAll({
       limit: limit,
       offset: offset,
+      where: { userId },
       order: [["interest", "ASC"]],
     });
     const totalCount = results.count;
@@ -379,26 +236,12 @@ usersRouter.get(
 );
 
 usersRouter.post(
-  "/:id/interests",
+  "/interests",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
+    const userId = req.userId;
     const interest = req.body.interest;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only update your own interests.",
-          ),
-        );
     // Verify the interest is provided
     if (!interest)
       return res
@@ -416,26 +259,12 @@ usersRouter.post(
 );
 
 usersRouter.delete(
-  "/:id/interests/:interestId",
+  "/interests/:interestId",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
+    const userId = +req.userId;
     const interestId = req.params.interestId;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only update your own interests.",
-          ),
-        );
     // Verify the interestId is provided
     if (!interestId)
       return res
@@ -470,27 +299,13 @@ usersRouter.delete(
 // USER EXPERIENCES
 
 usersRouter.get(
-  "/:id/experiences",
+  "/experiences",
   isAuthenticated,
   setUserId,
   async (req, res) => {
     const limit = req.query.limit || 10;
     const offset = req.query.offset || 0;
-    const userId = +req.params.id;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only view your own experiences.",
-          ),
-        );
+    const userId = +req.userId;
     // Get the user's experiences
     const results = await UserExperience.findAndCountAll({
       where: { userId },
@@ -512,26 +327,12 @@ usersRouter.get(
 );
 
 usersRouter.post(
-  "/:id/experiences",
+  "/experiences",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
+    const userId = +req.userId;
     const { company, position, startDate, endDate, description } = req.body;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only update your own experiences.",
-          ),
-        );
     // Verify the required information is provided
     if (!company || !position || !startDate)
       return res
@@ -558,11 +359,11 @@ usersRouter.post(
 );
 
 usersRouter.patch(
-  "/:id/experiences",
+  "/experiences",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
+    const userId = +req.userId;
     const { id, company, position, startDate, endDate, description } = req.body;
     // Verify the user exists
     const user = await User.findByPk(userId);
@@ -605,26 +406,12 @@ usersRouter.patch(
 );
 
 usersRouter.delete(
-  "/:id/experiences/:experienceId",
+  "/experiences/:experienceId",
   isAuthenticated,
   setUserId,
   async (req, res) => {
-    const userId = +req.params.id;
+    const userId = +req.userId;
     const experienceId = req.params.experienceId;
-    // Verify the user exists
-    const user = await User.findByPk(userId);
-    if (!user)
-      return res.status(404).json(new ApiResponse(404, "User not found."));
-    // Verify the user is the same as the one authenticated
-    if (userId != req.userId)
-      return res
-        .status(403)
-        .json(
-          new ApiResponse(
-            403,
-            "Forbidden: You can only update your own experiences.",
-          ),
-        );
     // Verify the experienceId is provided
     if (!experienceId)
       return res
@@ -669,4 +456,118 @@ usersRouter.get("/balance", isAuthenticated, setUserId, async (req, res) => {
     credits: userBalance.credits,
   };
   return res.status(200).json(new ApiResponse(200, "", result));
+});
+
+// USER EDUCATION
+
+usersRouter.get("/education", isAuthenticated, setUserId, async (req, res) => {
+  const limit = req.query.limit || 10;
+  const offset = req.query.offset || 0;
+  const userId = req.userId;
+  // Get the user's education history
+  const results = await UserEducation.findAndCountAll({
+    where: { userId },
+    limit: limit,
+    offset: offset,
+    order: [["startDate", "DESC"]],
+  });
+  const totalCount = results.count;
+  const educations = results.rows.map((education) => ({
+    id: education.id,
+    school: education.school,
+    degree: education.degree,
+    major: education.major,
+    startDate: education.startDate,
+    endDate: education.endDate,
+    gpa: education.gpa,
+    description: education.description,
+    degreeSpecs: [education.degree, education.major].filter(x=>x).join(", ")
+  }));
+  res.status(200).json(new ApiResponse(200, "", { totalCount, educations }));
+});
+
+usersRouter.post("/education", isAuthenticated, setUserId, async (req, res) => {
+  const userId = req.userId;
+  const { school, degree, major, startDate, endDate, gpa, description } = req.body;
+  // Verify the required information is provided
+  if (!school || !startDate)
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          "Missing information: Must provide a school name and start date.",
+        ),
+      );
+  // Create the user education
+  await UserEducation.create({
+    userId,
+    school,
+    degree,
+    major,
+    startDate,
+    endDate,
+    gpa,
+    description
+  });
+  res
+    .status(201)
+    .json(new ApiResponse(201, "Education added successfully."));
+});
+
+usersRouter.patch("/education/:id", isAuthenticated, setUserId, async (req, res) => {
+  const userId = req.userId;
+  const id = +(req.params.id);
+  const { school, degree, major, startDate, endDate, gpa, description } = req.body;
+
+  const userEducation = await UserEducation.findByPk(id);
+  // Update the user education
+  await userEducation.update({
+    userId,
+    school,
+    degree,
+    major,
+    startDate,
+    endDate,
+    gpa,
+    description
+  });
+  await userEducation.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, "Education added successfully."));
+});
+
+usersRouter.delete("/education/:educationId", isAuthenticated, setUserId, async (req, res) => {
+  const educationId = req.params.educationId;
+  const userId = req.userId;
+  // Verify the educationId is provided
+  if (!educationId)
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          400,
+          "Missing information: Must provide an education.",
+        ),
+      );
+  // Verify the education exists
+  const userEducation = await UserEducation.findOne({
+    where: {
+      userId,
+      id: educationId,
+    },
+  });
+  if (!userEducation)
+    return res
+      .status(404)
+      .json(
+        new ApiResponse(404, "User does not have the specified education."),
+      );
+  // Delete the user education
+  await userEducation.destroy();
+  res
+    .status(200)
+    .json(new ApiResponse(200, "Education removed successfully."));
 });

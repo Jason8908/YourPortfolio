@@ -10,6 +10,7 @@ import { authRouter } from "./routers/auth_router.js";
 import { productsRouter } from "./routers/products_router.js";
 import { stripeRouter } from "./routers/stripe_router.js";
 import { errorHandler } from "./middleware/errors.js";
+import { dropdownRouter } from "./routers/dropdown_router.js";
 
 const PORT = process.env.PORT || 3000;
 export const app = express();
@@ -35,6 +36,7 @@ app.use("/api/gen-ai", express.json(), genAiRouter);
 app.use("/api/auth", express.json(), authRouter);
 app.use("/api/products", express.json(), productsRouter);
 app.use("/api/stripe", stripeRouter);
+app.use("/api/dropdown", express.json(), dropdownRouter);
 
 app.use(errorHandler);
 

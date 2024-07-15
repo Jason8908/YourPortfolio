@@ -9,8 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TransmitCreditsData } from '../../classes/transmit-credits-data';
 import { CoverLetterDialogComponent } from '../cover-letter-dialog/cover-letter-dialog.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-job-description',
@@ -22,6 +22,7 @@ import { CoverLetterDialogComponent } from '../cover-letter-dialog/cover-letter-
     MatChipsModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './job-description.component.html',
   styleUrl: './job-description.component.css',
@@ -45,14 +46,17 @@ export class JobDescriptionComponent {
     saved: false,
   };
   @Output() onAIReturn = new EventEmitter<void>();
+  loading: boolean = false;
   constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
   ngOnInit() {
     console.log(this.balance);
   }
   generateCoverLetter(jobData: JobData, selectedAIModel: string | undefined) {
+    this.loading = true;
     this.apiService
       .generateCoverLetter(jobData, selectedAIModel)
       .subscribe((response) => {
+        this.loading = false;
         const buffer = response as Uint8Array;
         // Convert the buffer into a docx file blob
         const blob = new Blob([buffer], {
@@ -72,14 +76,46 @@ export class JobDescriptionComponent {
       });
   }
 
-  promptAIModelSelection(jobData: JobData) {
+  generateResume(jobData: JobData, selectedAIModel: string | undefined) {
+    this.loading = true;
+    this.apiService
+      .generateResume(jobData, selectedAIModel)
+      .subscribe((response) => {
+        this.loading = false;
+        const buffer = response as Uint8Array;
+        // Convert the buffer into a docx file blob
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+        // Create a link element and click it to download the file.
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `resume.docx`;
+        // Append the link to the body and click it.
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        // Emit an event to refresh the user's balance
+        this.onAIReturn.emit();
+      });
+  }
+
+  promptAIModelSelection(jobData: JobData, type: string) {
     const dialogRef = this.dialog.open(CoverLetterDialogComponent, {
       data: { credits: this.balance },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.generateCoverLetter(jobData, result);
+        switch (type) {
+          case 'letter':
+            this.generateCoverLetter(jobData, result);
+            break;
+          case 'resume':
+            this.generateResume(jobData, result);
+            break;
+        }
       }
     });
   }

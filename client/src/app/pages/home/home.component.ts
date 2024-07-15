@@ -27,10 +27,11 @@ export class HomeComponent {
   ) {
     this.route.queryParamMap.subscribe((params) => {
       const token = params.get('token');
-      // If the token is present, store it in a cookie and reload the page.
+      // If the token is present, store it in a cookie and navigate to the dashboard.
       if (token) {
         this.cookieService.set(CookieLabels.AUTH_TOKEN, token, undefined, '/');
         this.router.navigate(['/dashboard']);
+        console.log('After navigation!');
       }
     });
   }

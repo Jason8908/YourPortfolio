@@ -62,7 +62,7 @@ export class UserSkillsComponent {
   setUserSkills() {
     this.showSpinner();
     if (this.user) {
-      this.apiService.getUserSkills(this.user.id).subscribe(
+      this.apiService.getUserSkills().subscribe(
         (response) => {
           const results: SkillList = response.data;
           this.skills = results.skills;
@@ -83,7 +83,6 @@ export class UserSkillsComponent {
   }
 
   deleteSkill(skillId: Number) {
-    if (!this.user) this.router.navigate(['']);
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         message: 'Are you sure you want to delete this skill?',
@@ -93,7 +92,7 @@ export class UserSkillsComponent {
       (result) => {
         if (!result) return;
         // If the user confirms the deletion, then delete the skill.
-        this.apiService.deleteUserSkill(this.user!.id, skillId).subscribe(
+        this.apiService.deleteUserSkill(skillId).subscribe(
           () => {
             this.setUserSkills();
           },
@@ -111,13 +110,12 @@ export class UserSkillsComponent {
   }
 
   addSkill() {
-    if (!this.user) this.router.navigate(['']);
     let dialogRef = this.dialog.open(AddSkillDialogComponent);
     dialogRef.afterClosed().subscribe(
       (result) => {
         // If the result is a string, then call createSkill.
         if (typeof result === 'string') {
-          this.apiService.createUserSkill(this.user!.id, result).subscribe(
+          this.apiService.createUserSkill(result).subscribe(
             () => {
               this.setUserSkills();
             },
@@ -128,7 +126,7 @@ export class UserSkillsComponent {
           );
         } else if (typeof result === 'number') {
           // If the result is a number, then call addUserSkill.
-          this.apiService.addUserSkill(this.user!.id, result).subscribe(
+          this.apiService.addUserSkill(result).subscribe(
             () => {
               this.setUserSkills();
             },
