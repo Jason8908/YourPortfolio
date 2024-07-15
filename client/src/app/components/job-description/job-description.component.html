@@ -20,9 +20,13 @@
         Unsave Job
       </button>
     </ng-template>
-    <button mat-flat-button (click)="promptAIModelSelection(jobData)">
+    <button mat-flat-button (click)="promptAIModelSelection(jobData, 'letter')" [disabled]="loading">
       Generate Cover Letter
     </button>
+    <button mat-flat-button (click)="promptAIModelSelection(jobData, 'resume')" [disabled]="loading">
+      Generate Resume
+    </button>
+    <mat-spinner *ngIf="loading" class="ai-spinner"></mat-spinner>
   </mat-card-actions>
   <hr />
   <mat-card-content *ngIf="jobData.attributes && jobData.attributes.length > 0">

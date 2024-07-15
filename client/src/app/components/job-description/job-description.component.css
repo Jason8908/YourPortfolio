@@ -31,3 +31,7 @@
 .job-buttons {
   gap: 10px;
 }
+
+.ai-spinner {
+  width: 10%;
+}

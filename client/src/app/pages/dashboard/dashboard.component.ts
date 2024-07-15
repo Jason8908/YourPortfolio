@@ -37,10 +37,4 @@ export class DashboardComponent {
       },
     });
   }
-
-  // ngOnInit() {
-  //   const user = this.localStorage.getUser();
-  //   if (!user) this.router.navigate(['']);
-  //   this.user = user as User;
-  // }
 }

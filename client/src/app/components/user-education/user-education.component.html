@@ -1,0 +1,46 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Education</mat-card-title>
+  </mat-card-header>
+  <mat-card-actions>
+    <button mat-button (click)="addEducation()">
+      Add Education
+      <mat-icon>add</mat-icon>
+    </button>
+  </mat-card-actions>
+  <mat-card-content>
+    <mat-accordion>
+      <mat-expansion-panel hideToggle *ngFor="let edu of educations">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ edu.school }}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ formatDate(edu.startDate) }} &#8212;
+            {{
+              edu.endDate ? formatDate(edu.endDate) : "Present"
+            }}
+            <mat-chip class="gpa-chip" *ngIf="edu.gpa">{{edu.gpa}} GPA</mat-chip>
+          </mat-panel-description>
+          <button mat-icon-button (click)="updateEducation(edu)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteEducation(edu.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-expansion-panel-header>
+        <div *ngIf="edu.degree || edu.major" class="degree-specs">
+          {{ edu.degreeSpecs }}
+        </div>
+        <div class="description">
+          <p *ngIf="edu.description">
+            {{ edu.description }}
+          </p>
+          <p *ngIf="!edu.description">
+            <i> No Description Provided </i>
+          </p>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-card-content>
+</mat-card>

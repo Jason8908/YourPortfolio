@@ -1,6 +1,7 @@
 import { createReport } from "docx-templates";
 import fs from "fs";
 import { CoverLetter } from "../entities/cover-letter.js";
+import { Resume } from "../entities/resume.js";
 import path from "path";
 
 /**
@@ -11,7 +12,7 @@ import path from "path";
  * @throws {Error} If an invalid cover letter argument is passed.
  */
 export const generateCoverLetterBrown = async (coverLetter) => {
-  if ((!coverLetter) instanceof CoverLetter)
+  if (!(coverLetter instanceof CoverLetter))
     throw new Error(
       "Invalid cover letter arugment passed to generateCoverLetterBrown().",
     );
@@ -24,10 +25,26 @@ export const generateCoverLetterBrown = async (coverLetter) => {
   return buffer;
 };
 
+export const generateResumeBasic = async (resume) => {
+  if (!(resume instanceof Resume))
+    throw new Error(
+      "Invalid resume argument passed to generateResumeBasic().",
+    );
+  const template = fs.readFileSync(TemplatePaths.ResumeBasic);
+  const buffer = await createReport({
+    template,
+    data: resume,
+    cmdDelimiter: ["+++", "+++"],
+  });
+  return buffer;
+}
+
 export const OutputPaths = {
   CoverLetter: "letters",
 };
 
 export const TemplatePaths = {
   CoverLetterBrown: "templates/cover-letter-brown.docx",
+  ResumeBasic: "templates/resume-basic.docx",
 };
+
