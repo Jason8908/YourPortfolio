@@ -72,9 +72,7 @@ export class JobsComponent {
     this.apiService.getJobs(search).subscribe({
       next: (res) => {
         this.jobSearchResult = res.data;
-        this.jobSearchResult.forEach((job) => {
-          job.saved = job.UserJobs?.length > 0;
-        });
+        console.log(this.jobSearchResult);
         this.currentJob = this.jobSearchResult[0];
         this.loading = false;
       },

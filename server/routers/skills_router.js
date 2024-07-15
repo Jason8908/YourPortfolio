@@ -25,20 +25,20 @@ skillsRouter.get("/", isAuthenticated, async (req, res) => {
   //   ],
   // });
 
-  const results = await Atrribute.findAndCountAll({
-    where: { name: { [Op.iLike]: `%${search}%` }, isSkill: true },
+  const results = await Skill.findAndCountAll({
+    where: { skillName: { [Op.iLike]: `%${search}%` } },
     limit: limit,
     offset: offset,
     order: [
-      [Sequelize.fn("LENGTH", Sequelize.col("name")), "ASC"],
-      ["name", "ASC"],
+      [Sequelize.fn("LENGTH", Sequelize.col("skillName")), "ASC"],
+      ["skillName", "ASC"],
     ],
   });
 
   const totalCount = results.count;
   const skills = results.rows.map((skill) => ({
     id: skill.id,
-    name: skill.name,
+    name: skill.skillName,
   }));
   res.status(200).json(new ApiResponse(200, "", { totalCount, skills }));
 });

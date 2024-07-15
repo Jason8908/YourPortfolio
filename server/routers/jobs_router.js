@@ -18,7 +18,7 @@ const checkSaved = (job) => {
   }
 };
 
-jobsRouter.get("/search", isAuthenticated, async (req, res) => {
+jobsRouter.get("/search", isAuthenticated, setUserId, async (req, res) => {
   let ids = await getIndeedJobsIds({
     jobQuery: req.query.query,
     jobLocation: req.query.location,
@@ -37,7 +37,17 @@ jobsRouter.get("/search", isAuthenticated, async (req, res) => {
         [Op.in]: ids,
       },
     },
-    include: UserJob,
+    include: [
+      {
+        model: User,
+        through: {
+          model: UserJob,
+          where: {
+            UserId: req.userId, // Replace specificUserId with the actual user ID you want to check
+          },
+        },
+      },
+    ],
   });
 
   let foundJobIds = jobs.map((job) => job.externalId);
@@ -54,9 +64,17 @@ jobsRouter.get("/search", isAuthenticated, async (req, res) => {
     });
   }
 
-  return res.status(200).json({
-    data: jobs.concat(newJobsWithId),
-  });
+  let data = jobs.concat(newJobsWithId)
+  data = data.map(elem => elem.get())
+  console.log(data)
+  data.forEach((job) => {
+    console.log(job)
+    job.saved = job.Users.length > 0
+    delete job.Users
+  })
+
+
+  return res.status(200).json(new ApiResponse(200, "", data));
 });
 
 jobsRouter.post("/:id/save", isAuthenticated, setUserId, async (req, res) => {
@@ -95,7 +113,7 @@ jobsRouter.delete("/:id/save", isAuthenticated, setUserId, async (req, res) => {
     });
 
     if (deletedJob == 0) {
-      return res.status(400).json(new ApiResponse(500, "Job was not saved"));
+      return res.status(500).json(new ApiResponse(500, "Job was not saved"));
     }
 
     return res.status(201).json(new ApiResponse(201, "Job Deleted"));
