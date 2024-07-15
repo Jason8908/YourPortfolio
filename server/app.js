@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 export const app = express();
 
 const corsOptions = {
-  origin: "http://localhost:4200",
+  origin: process.env.CLIENT_BASE_URL || "http://localhost:4200",
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -40,5 +40,5 @@ app.use(errorHandler);
 
 app.listen(PORT, (err) => {
   if (err) console.log(err);
-  else console.log("HTTP server on http://localhost:%s", PORT);
+  else console.log("HTTP server on port %s", PORT);
 });
