@@ -1,23 +1,36 @@
-import fetch from "node-fetch";
-import fs from "fs";
 import puppeteer from "puppeteer";
 import { getSkills } from "./check-skill.js";
+import "dotenv/config"
 
-const REQUEST_DELAY = 600;
+const PUPPETTEER_SETTINGS_DEV = {
+  headless: true,
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  defaultViewport: {
+    width: 1280,
+    height: 800,
+  },
+}
+
+const PUPPETTEER_SETTINGS_PROD = {
+  headless: true,
+  executablePath: '/usr/bin/google-chrome',
+  ignoreDefaultArgs: ['--disable-extensions'],
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  defaultViewport: {
+    width: 1280,
+    height: 800,
+  },
+}
+
+const PUPPETEER_SETTINGS = process.env.PRODUCTION == "true" ? PUPPETTEER_SETTINGS_PROD : PUPPETTEER_SETTINGS_DEV
+
 
 async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
   const encodedQuery = encodeURIComponent(jobQuery);
   const encodedLocation = encodeURIComponent(jobLocation);
   const pageParam = page ? `&start=${page * 10}` : "";
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    defaultViewport: {
-      width: 1280,
-      height: 800,
-    },
-  });
+  const browser = await puppeteer.launch(PUPPETEER_SETTINGS);
 
   try {
     const browserPage = await browser.newPage();
@@ -43,14 +56,7 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
 }
 
 async function getIndeedJobsv2({ ids }) {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    defaultViewport: {
-      width: 1280,
-      height: 800,
-    },
-  });
+  const browser = await puppeteer.launch(PUPPETEER_SETTINGS);
 
   try {
     const jobs = await Promise.all(
