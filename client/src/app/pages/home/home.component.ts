@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CookieService } from 'ngx-cookie-service';
 import { CookieLabels } from '../../app.constants';
@@ -14,7 +14,7 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [NgIf, HomeNavbarComponent, MatButtonModule, MatIconModule],
+  imports: [NgIf, HomeNavbarComponent, MatButtonModule, MatIconModule, RouterModule],
 })
 export class HomeComponent {
   isAuth: boolean = false;
