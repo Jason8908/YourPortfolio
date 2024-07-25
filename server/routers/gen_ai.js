@@ -164,7 +164,7 @@ const promptVertexCoverLetter = async (
   const jobDataString = createJobDataString(jobData);
   // LLM Prompt to generate cover letter
   const prompt = `My name is ${user.fname} ${user.lname}. Write a cover letter for me; do not place any tokens in it.\n
-    ${jobDataString ? `The following is the job posintg: \n${jobDataString}. \n` : ""}
+    ${jobDataString ? `The following is the job posting: \n${jobDataString}. \n` : ""}
     ${skills.length > 0 ? `My Skills: ${skills.join(", ")}. \n` : ""}
     ${experiencesString.length > 0 ? `Experiences: ${experiencesString}. \n` : ""}
     Do not include any text other than the actual cover letter itself.\n
@@ -313,7 +313,7 @@ const generateResumeSkills = async (vertex, jobDataString, skills) => {
   const resp = await vertex.generateContent(prompt);
   const content = resp.response;
   const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  return result[0].split(",").map(item => item.trim());
+  return result[0].split(",").map(item => item.trim()).filter(item => item.length > 0);
 }
 
 const generateResumeEducations = async (vertex, jobDataString, educations) => {
@@ -326,7 +326,7 @@ const generateResumeEducations = async (vertex, jobDataString, educations) => {
   const resp = await vertex.generateContent(prompt);
   const content = resp.response;
   const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  const educationIndices = result[0].split(",").map(item => +(item.trim()));
+  const educationIndices = result[0].split(",").map(item => +(item.trim())).filter(item => !isNaN(item));
   // Extracting the selected educations
   const selectedEducations = educations.filter((_, index) => educationIndices.includes(index + 1));
   let resumeEducations = [];
@@ -364,13 +364,13 @@ const generateResumeExperiences = async (vertex, jobDataString, experiences) => 
     const experiencePointsPrompt = `Here is a job posting: ${jobDataString}\n
                                     Here is an experience I have: ${experienceString}\n
                                     Generate a list of at most 5 bullet points that describe this experience.\n
-                                    DO NOT LIE. DO NOT INCLUDE ANYTHING THAT IS NOT TRUE.\n
+                                    To the best of your ability, extrapolate information from my experience that may be relevant to the job posting.\n
                                     However, make the points relevant to the job posting.\n
                                     Return this data as a list of sentences seperated by new lines.\n
                                     Do not send any text other than the sentences themselves.\n`;
     const expResp = await vertex.generateContent(experiencePointsPrompt);
     const expContent = expResp.response;
-    const points = expContent.candidates.at(0).content.parts.at(0).text.split("\n");
+    const points = expContent.candidates.at(0).content.parts.at(0).text.split("\n").map(point => point.trim()).filter(point => point.length > 0);
     const startDateString = formatDate(experience.startDate);
     const endDateString = experience.endDate ? formatDate(experience.endDate) : "Present";
     resumeExperiences.push({
