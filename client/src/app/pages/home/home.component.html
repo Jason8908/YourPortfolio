@@ -2,7 +2,71 @@
   [isAuth]="isAuth"
   (onAuthChange)="updateAuth($event)"
 ></app-home-navbar>
-<button mat-fab extended *ngIf="!isAuth" (click)="redirectToGoogle()">
-  <mat-icon>login</mat-icon>
-  Continue with Google
-</button>
+<div class="main-content-wrapper">
+  <div class="row information-wrapper" id="generalDescription">
+    <div class="col-6">
+      <h1 class="heading apercu-font">
+        Welcome to <span class="emphasize-color">YourPortfolio</span>, the one-stop shop for creating customized job application packages with
+        <span class="emphasize-color">AI</span>.
+      </h1>
+      <p class="paragraph apercu-font">
+        YourPortfolio leverages AI in order to help you create cover letters and resumes based off of your previous experience and current skills,
+        as well as the information from a job posting itself.
+      </p>
+      <button class="yourport-button apercu-font box-shadow-teal-sm" (click)="redirectToGoogle()" *ngIf="!isAuth">Get Started with Google</button>
+      <button class="yourport-button apercu-font box-shadow-teal-sm" routerLink="/dashboard" routerLinkActive="router-link-active"  *ngIf="isAuth">Generate my Application Package</button>
+    </div>
+    <div class="col-6">
+      <div class="sample-resume-wrapper box-shadow-teal">
+        <img src="assets/sample-resume.png" alt="Sample Resume" class="sample-image" />
+      </div>
+    </div>
+  </div>
+  <div id="aboutResumes" class="information-wrapper">
+    <h2 class="heading apercu-font center-text emphasize-gradient">Tailored Resumes using AI</h2>
+    <div class="wrapper-md">
+      <p class="paragraph apercu-font center-text">
+        YourPortfolio uses AI to create a resume that is tailored to the job posting you are applying for. In conjunction with the information you provide,
+        YourPortfolio will generate a resume with the most relevant skills and experience you possess. The generated resume will be sure to catch the eye of
+        the hiring manager at your dream job.
+      </p>
+    </div>
+  </div>
+  <div id="howItWorks" class="information-wrapper">
+    <h2 class="heading apercu-font center-text emphasize-gradient">How it Works</h2>
+    <div class="row">
+      <div class="col-3">
+        <div class="how-it-works-card">
+          <span class="material-symbols-outlined steps-icon">counter_1</span>
+          <p class="paragraph apercu-font">
+            Sign in with your Google account to get started.
+          </p>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="how-it-works-card">
+          <span class="material-symbols-outlined steps-icon">counter_2</span>
+          <p class="paragraph apercu-font">
+            Complete your profile by entering your past experience, education, and skills.
+          </p>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="how-it-works-card">
+          <span class="material-symbols-outlined steps-icon">counter_3</span>
+          <p class="paragraph apercu-font">
+            Search for a job using our search bar and select a job posting.
+          </p>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="how-it-works-card">
+          <span class="material-symbols-outlined steps-icon">counter_4</span>
+          <p class="paragraph apercu-font">
+            Generate and download your application package which includes a resume and cover letter created using AI.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

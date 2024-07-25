@@ -1,7 +1,6 @@
-<mat-toolbar color="primary" class="navbar">
+<mat-toolbar class="navbar">
   <span>YourPortfolio</span>
-  <a mat-button routerLink="/">Home</a>
-  <a mat-button routerLink="/">About</a>
+  <a mat-button routerLink="/dashboard" *ngIf="isAuth">Dashboard</a>
   <span class="spacer"></span>
   <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="isAuth">
     <mat-icon>account_circle</mat-icon>

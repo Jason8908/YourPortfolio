@@ -1,0 +1,114 @@
+.emphasize-color {
+  color: #50cebf;
+}
+
+.emphasize-purple {
+  color: rgba(100,0,255,1);
+}
+
+.emphasize-gradient {
+  /* background: linear-gradient(90deg, rgba(121,222,210,1) 0%, rgba(100,0,255,1) 100%); */
+  background: linear-gradient(90deg, rgb(147, 184, 179) 0%, rgb(95, 198, 186) 50%, rgb(0, 109, 96) 100%);
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+}
+
+.heading {
+  color: white;
+  font-size: 3em;
+}
+
+.main-content-wrapper {
+  width: 75%;
+  margin: 0 auto;
+  margin-top: 4%;
+}
+
+.paragraph {
+  color: white;
+  font-weight: 200;
+  font-size: 1.2em;
+}
+
+.apercu-font {
+  font-family: 'Apercu', sans-serif;
+}
+
+.sample-image {
+  width: 100%;
+}
+
+.box-shadow-teal {
+  -webkit-box-shadow: 0px 0px 18px 1px rgba(91,233,216,0.81);
+  box-shadow: 0px 0px 18px 1px rgba(91,233,216,0.81);
+}
+
+.sample-resume-wrapper {
+  background-color: white;
+  padding: 2%;
+  border-radius: 10px;
+  width: 70%;
+  display: block;
+  margin: auto;
+  animation-name: bobbing;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes bobbing {
+  0% {
+    transform: translateY(10px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+.yourport-button {
+  margin-top: 17px;
+  background-color: rgb(62, 145, 136);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition-property: background-color transform;
+  transition-duration: 100ms;
+}
+
+.yourport-button:hover {
+  background-color: rgb(50, 120, 110);
+}
+
+.box-shadow-teal-sm {
+  -webkit-box-shadow: 0px 0px 12px 1px rgba(148, 225, 216, 0.81);
+  box-shadow: 0px 0px 12px 1px rgba(148, 225, 216, 0.81);
+}
+
+.information-wrapper {
+  margin-bottom: 100px;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.steps-icon {
+  color: white;
+  transform: scale(2.3);
+}
+
+.how-it-works-card {
+  padding: 10px;
+}
+
+.wrapper-md {
+  width: 80%;
+  margin: 0 auto;
+}
