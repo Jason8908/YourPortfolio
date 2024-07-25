@@ -69,7 +69,7 @@ jobsRouter.get("/search", isAuthenticated, setUserId, async (req, res) => {
   console.log(data)
   data.forEach((job) => {
     console.log(job)
-    job.saved = job.Users.length > 0
+    job.saved = job.Users && job.Users.length > 0
     delete job.Users
   })
 
