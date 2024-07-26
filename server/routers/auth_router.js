@@ -57,15 +57,7 @@ authRouter.get("/login/google", (req, res) => {
 authRouter.get("/redirect/google", async (req, res) => {
   const code = req.query.code;
   if (!code)
-    return res
-      .status(HttpStatusCode.Unauthorized)
-      .json(
-        new ApiResponse(
-          HttpStatusCode.Unauthorized,
-          "Google login failed. Missing code query parameter.",
-        ),
-      );
-
+    return res.redirect(`${yourportRedirect}/`);
   try {
     const { tokens } = await googleOAuthClient.getToken(code);
 
