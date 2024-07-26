@@ -34,6 +34,11 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
 
   try {
     const browserPage = await browser.newPage();
+
+    await browserPage.evaluateOnNewDocument(() => {
+      delete navigator.__proto__.webdriver;
+    });
+
     await browserPage.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
     );
@@ -87,6 +92,11 @@ async function getIndeedJobsv2({ ids }) {
 
 async function getIndeedJobFromIdv2({ browser, id }) {
   const browserPage = await browser.newPage();
+
+  await browserPage.evaluateOnNewDocument(() => {
+    delete navigator.__proto__.webdriver;
+  });
+
   await browserPage.setUserAgent(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
   );
