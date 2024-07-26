@@ -1,5 +1,14 @@
 <app-auth-header (onBalanceChange)="updateBalance($event)"></app-auth-header>
 <div class="pricing-wrapper">
+  <div>
+    <h1 class="heading apercu-font">
+      Purchase <span class="emphasize-color">Credits</span>
+    </h1>
+    <p class="paragraph apercu-font">
+      Credits allow you to use more advanced and better trained models of AI when generating your application packages.
+      You can obtain credits by purchasing them below.
+    </p>
+  </div>
   <app-user-balance [balance]="balance"></app-user-balance>
   <app-topup-options></app-topup-options>
 </div>

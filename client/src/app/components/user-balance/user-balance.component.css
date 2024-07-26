@@ -3,6 +3,10 @@ mat-card-content {
   padding-top: 1%;
 }
 
+mat-card {
+  background-color: black;
+}
+
 .user-balance-display {
   width: 50%;
   margin-left: 0;

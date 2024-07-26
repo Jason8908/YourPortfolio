@@ -11,3 +11,9 @@
   padding-left: 20px;
   padding-right: 20px;
 }
+
+mat-card {
+  background-color: black;
+  border: 1px solid white;
+  border-radius: 0px;
+}

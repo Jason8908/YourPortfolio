@@ -91,7 +91,6 @@ jobsRouter.post("/:id/save", isAuthenticated, setUserId, async (req, res) => {
 
     return res.status(201).json(new ApiResponse(201, "", savedJob));
   } catch (e) {
-    console.log(e);
     return res.status(500).json(new ApiResponse(500, e.toString()));
   }
 });

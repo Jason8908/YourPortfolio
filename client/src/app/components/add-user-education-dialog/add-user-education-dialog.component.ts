@@ -6,11 +6,13 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatInputModule } from '@angular/material/input';
 import { Education } from '../../classes/education';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-add-user-education-dialog',
   standalone: true,
   imports: [
+    NgIf,
     MatDialogModule,
     MatInputModule,
     FormsModule,

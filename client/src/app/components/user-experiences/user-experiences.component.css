@@ -6,3 +6,16 @@
 .delete-btn {
   background-color: #f44336 !important;
 }
+
+mat-card {
+  background-color: black;
+}
+
+mat-expansion-panel {
+  background-color: rgb(25, 23, 23);
+  color: white;
+}
+
+mat-accordion, mat-expansion-panel-header {
+  color: white;
+}

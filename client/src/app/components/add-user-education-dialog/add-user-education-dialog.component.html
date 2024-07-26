@@ -1,9 +1,16 @@
 <h2 mat-dialog-title>
-  {{
-    eduData
-      ? "Update Education"
-      : "Add Education"
-  }}
+  <span *ngIf="eduData">
+    <span class="font-white">
+      Update
+      <span class="emphasize-teal font-bold">Education</span>
+    </span>
+  </span>
+  <span *ngIf="!eduData">
+    <span class="font-white">
+      Add
+      <span class="emphasize-teal font-bold">Education</span>
+    </span>
+  </span>
 </h2>
 <mat-dialog-content class="mat-typography">
   <div class="row">

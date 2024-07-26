@@ -31,7 +31,6 @@ export class HomeComponent {
       if (token) {
         this.cookieService.set(CookieLabels.AUTH_TOKEN, token, undefined, '/');
         this.router.navigate(['/dashboard']);
-        console.log('After navigation!');
       }
     });
   }

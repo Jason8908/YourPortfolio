@@ -13,6 +13,7 @@ import { AddUserEducationDialogComponent } from '../add-user-education-dialog/ad
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-user-education',
@@ -27,24 +28,29 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
     MatExpansionModule,
     MatChipsModule,
     MatCardModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './user-education.component.html',
   styleUrl: './user-education.component.css'
 })
 export class UserEducationComponent {
   educations: Array<Education> = [];
+  loading: boolean = false;
   readonly dialog = inject(MatDialog);
   constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
   addEducation() {
+    if (this.loading) return;
     let dialogRef = this.dialog.open(AddUserEducationDialogComponent);
     dialogRef.afterClosed().subscribe((result) => {
       if (!result)
         return;
+      this.loading = true;
       this.apiService.addUserEducation(result).subscribe(
         () => {
           this.updateUserEducation();
         },
         (error) => {
+          this.loading = false;
           console.log(`Error adding user education: ${JSON.stringify(error)}`);
           this.snackbar.open(`Error adding user education`, `OK`);
         }
@@ -52,16 +58,19 @@ export class UserEducationComponent {
     });
   }
   updateEducation(education: Education) {
+    if (this.loading) return;
     let dialogRef = this.dialog.open(AddUserEducationDialogComponent, {
       data: { ...education },
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result == null) return;
+      this.loading = true;
       this.apiService.updateUserEducation(result, education.id as number).subscribe(
         () => {
           this.updateUserEducation();
         },
         (error) => {
+          this.loading = false;
           console.log(
             `Error updating user education: ${JSON.stringify(error)}`
           );
@@ -71,6 +80,7 @@ export class UserEducationComponent {
     });
   }
   deleteEducation(id: number | undefined) {
+    if (this.loading) return;
     if (!id) {
       this.snackbar.open(`Error deleting user education`, `OK`);
       return;
@@ -82,6 +92,7 @@ export class UserEducationComponent {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
+        this.loading = true;
         this.apiService
           .deleteUserEducation(id as number)
           .subscribe(
@@ -89,6 +100,7 @@ export class UserEducationComponent {
               this.updateUserEducation();
             },
             (error) => {
+              this.loading = false;
               console.log(
                 `Error deleting user education: ${JSON.stringify(error)}`
               );
@@ -99,6 +111,7 @@ export class UserEducationComponent {
     });
   }
   updateUserEducation() {
+    this.loading = true;
     this.apiService.getUserEducation().subscribe({
       next: (response) => {
         const result = response.data as EducationList;
@@ -109,8 +122,10 @@ export class UserEducationComponent {
             education.endDate = new Date(education.endDate);
           }
         }
+        this.loading = false;
       },
       error: (err) => {
+        this.loading = false;
         console.log(`Error: Could not update user education: ${JSON.stringify(err)}`);
         this.snackbar.open(`Error: Could not update user education`, 'OK');
       },

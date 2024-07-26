@@ -25,6 +25,7 @@ import { query } from '@angular/animations';
   styleUrl: './job-search.component.css',
 })
 export class JobSearchComponent {
+  canSubmit:boolean = false;
   @Input() formValues = {
     query: undefined,
     location: undefined,
@@ -50,5 +51,9 @@ export class JobSearchComponent {
     if (this.formValues.query) {
       this.jobSearch.setValue(this.formValues);
     }
+
+    this.jobSearch.valueChanges.subscribe(() => {
+      this.canSubmit = this.jobSearch.value.query && this.jobSearch.value.location;
+    });
   }
 }

@@ -1,13 +1,18 @@
 .example-card {
   margin: 10px 10px;
   transition: 0.3s;
+  transition-property: all;
 }
 
 .example-card:hover {
-  margin: 10px 10px;
-  background-color: #90caf9;
+  transform: scale(1.02);
+  cursor: pointer;
 }
 
 .example-card-footer {
   padding: 16px;
+}
+
+mat-card {
+  background-color: black;
 }

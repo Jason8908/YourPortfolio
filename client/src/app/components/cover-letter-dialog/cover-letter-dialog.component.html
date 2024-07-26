@@ -1,10 +1,13 @@
-<h2 mat-dialog-title>Generate Cover Letter</h2>
+<h2 mat-dialog-title>
+  <span class="font-white">Generate </span>
+  <span class="emphasize-teal font-bold">{{data.type}}</span>
+</h2>
 <mat-dialog-content class="mat-typography">
-  <h3>Select AI Model</h3>
+  <h3 class="font-white">Select AI Model</h3>
   <mat-radio-group [(ngModel)]="selectedAIModel">
-    <mat-radio-button [value]="aiModels.Gemini15Flash" [checked]="true"
-      >Google Gemini 1.5 Flash</mat-radio-button
-    >
+    <mat-radio-button [value]="aiModels.Gemini15Flash" [checked]="true">
+      Google Gemini 1.5 Flash
+    </mat-radio-button>
     <mat-radio-button
       [value]="aiModels.Gemini15Pro"
       [disabled]="!data.credits || data.credits < 1"

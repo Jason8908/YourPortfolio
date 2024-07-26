@@ -1,9 +1,21 @@
 .form-fields {
   display: flex;
-  /* align-content: center;
-    align-items: center; */
+
   gap: 10px;
 }
 .button-container {
   padding-top: 8px;
 }
+mat-form-field {
+  background-color: inherit;
+  color: white;
+}
+
+.yourport-input {
+  color: white;
+}
+
+mat-label {
+  color: white;
+}
+
