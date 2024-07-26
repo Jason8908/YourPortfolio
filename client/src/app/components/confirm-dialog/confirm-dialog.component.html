@@ -1,6 +1,13 @@
-<h2 mat-dialog-title>Confirm Action</h2>
+<h2 mat-dialog-title>
+  <span class="font-white">
+    Confirm
+  </span>
+  <span class="font-bold emphasize-teal">
+    Action
+  </span>
+</h2>
 <mat-dialog-content class="mat-typography">
-  <p>{{ message }}</p>
+  <p class="font-white">{{ message }}</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button [mat-dialog-close]="false" cdkFocusInitial>No</button>

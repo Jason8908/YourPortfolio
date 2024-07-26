@@ -35,3 +35,7 @@
 .ai-spinner {
   width: 10%;
 }
+
+mat-card {
+  background-color: black;
+}

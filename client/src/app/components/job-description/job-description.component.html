@@ -1,7 +1,11 @@
 <mat-card *ngIf="jobData" appearance="outlined" class="description-card">
   <mat-card-header>
-    <mat-card-title>{{ jobData.title }}</mat-card-title>
-    <mat-card-subtitle>{{ jobData.employer }}</mat-card-subtitle>
+    <mat-card-title>
+      {{ jobData.title }}
+    </mat-card-title>
+    <mat-card-subtitle>
+      <span class="emphasize-teal">{{ jobData.employer }}</span>
+    </mat-card-subtitle>
   </mat-card-header>
   <hr />
   <mat-card-actions class="job-buttons">
@@ -31,20 +35,20 @@
   <hr />
   <mat-card-content *ngIf="jobData.attributes && jobData.attributes.length > 0">
     <p>Skills Required For Position</p>
-    <mat-chip-set>
-      <mat-chip *ngFor="let attribute of jobData.attributes">
+    <div class="yourport-chipset">
+      <div class="yourport-chip yourport-chip-teal" *ngFor="let attribute of jobData.attributes">
         {{ attribute }}
-      </mat-chip>
-    </mat-chip-set>
+      </div>
+    </div>
   </mat-card-content>
   <hr *ngIf="jobData.attributes && jobData.attributes.length > 0" />
   <mat-card-content *ngIf="jobData.benefits && jobData.benefits.length > 0">
     <p>Benefits</p>
-    <mat-chip-set>
-      <mat-chip *ngFor="let benefit of jobData.benefits">
+    <div class="yourport-chipset">
+      <div class="yourport-chip yourport-chip-teal" *ngFor="let benefit of jobData.benefits">
         {{ benefit }}
-      </mat-chip>
-    </mat-chip-set>
+      </div>
+    </div>
   </mat-card-content>
   <hr *ngIf="jobData.benefits && jobData.benefits.length > 0" />
   <mat-card-content>

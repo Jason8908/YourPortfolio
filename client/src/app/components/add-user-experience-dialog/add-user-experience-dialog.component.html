@@ -1,22 +1,29 @@
 <h2 mat-dialog-title>
-  {{
-    expData
-      ? "Update Work/Volunteer Experience"
-      : "Add Work/Volunteer Experience"
-  }}
+  <span *ngIf="expData">
+    <span class="font-white">
+      Update Work/Volunteer
+      <span class="emphasize-teal font-bold">Experience</span>
+    </span>
+  </span>
+  <span *ngIf="!expData">
+    <span class="font-white">
+      Add Work/Volunteer
+      <span class="emphasize-teal font-bold">Experience</span>
+    </span>
+  </span>
 </h2>
 <mat-dialog-content class="mat-typography">
   <div class="row">
     <div class="col-6">
       <mat-form-field>
-        <mat-label>Position*</mat-label>
-        <input matInput [(ngModel)]="exp.position" />
+        <mat-label>Position</mat-label>
+        <input matInput [(ngModel)]="exp.position" [required]="true"/>
       </mat-form-field>
     </div>
     <div class="col-6">
       <mat-form-field>
-        <mat-label>Company*</mat-label>
-        <input matInput [(ngModel)]="exp.company" />
+        <mat-label>Company</mat-label>
+        <input matInput [(ngModel)]="exp.company" [required]="true"/>
       </mat-form-field>
     </div>
   </div>
@@ -24,11 +31,12 @@
   <div class="row">
     <div class="col-6">
       <mat-form-field>
-        <mat-label>Start Date*</mat-label>
+        <mat-label>Start Date</mat-label>
         <input
           matInput
           [matDatepicker]="startDatePicker"
           [(ngModel)]="exp.startDate"
+          [required]="true"
         />
         <mat-datepicker-toggle
           matSuffix

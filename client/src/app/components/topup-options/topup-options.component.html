@@ -7,8 +7,14 @@
     <mat-grid-tile *ngFor="let option of options">
       <mat-card class="topup-option-card">
         <mat-card-header class="topup-option-header">
-          <mat-card-title>{{ option.label }}</mat-card-title>
-          <mat-card-subtitle>{{ option.description }}</mat-card-subtitle>
+          <mat-card-title>
+            <span class="emphasize-teal font-bold">{{ option.label.split(" ")[0] }}</span>
+            {{ option.label.split(" ")[1] }}
+          </mat-card-title>
+          <mat-card-subtitle>
+            <span class="emphasize-teal font-bold">{{ option.description.split(" ")[0] }} </span>
+            <span class="font-white">{{ option.description.split(" ")[1] }}</span>
+          </mat-card-subtitle>
         </mat-card-header>
         <div class="icon-wrapper">
           <mat-icon class="topup-option-icon">local_atm</mat-icon>
@@ -17,7 +23,11 @@
           <p>${{ option.price }} {{ option.currency }}</p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button (click)="purchaseTopup(option)">Purchase</button>
+          <button mat-button (click)="purchaseTopup(option)" class="purchase-button">
+            <span class="emphasize-teal font-bold">
+              Purchase
+            </span>
+          </button>
         </mat-card-actions>
       </mat-card>
     </mat-grid-tile>

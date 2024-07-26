@@ -1,15 +1,15 @@
 <form [formGroup]="jobSearch" (submit)="search()">
   <div class="form-fields">
     <mat-form-field>
-      <mat-label>Job Query</mat-label>
-      <input matInput formControlName="query" />
+      <mat-label class="apercu-font">Job Query</mat-label>
+      <input matInput formControlName="query" [required]="true" style="color: white"/>
     </mat-form-field>
     <mat-form-field>
-      <mat-label>Location</mat-label>
-      <input matInput formControlName="location" />
+      <mat-label class="apercu-font">Location</mat-label>
+      <input matInput formControlName="location" [required]="true" style="color: white"/>
     </mat-form-field>
     <div class="button-container">
-      <button mat-flat-button type="submit">Search</button>
+      <button type="submit" class="apercu-font yourport-button" [disabled]="!canSubmit">Search</button>
     </div>
   </div>
 </form>

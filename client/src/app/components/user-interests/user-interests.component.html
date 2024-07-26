@@ -1,21 +1,24 @@
 <mat-card appearance="outlined">
   <mat-card-header>
-    <mat-card-title>Interests</mat-card-title>
+    <mat-card-title>
+      <div class="yourport-card-title">
+        <div>Interests</div>
+        <mat-spinner class="yourport-spinner-sm" *ngIf="loading"></mat-spinner>
+      </div>
+    </mat-card-title>
   </mat-card-header>
   <mat-card-actions>
-    <button mat-button (click)="addInterest()">
-      Add Interest
-      <mat-icon>add</mat-icon>
+    <button mat-button (click)="addInterest()" [disabled]="loading">
+      <span class="emphasize-teal font-bold">Add Interest</span>
+      <mat-icon class="emphasize-teal font-bold">add</mat-icon>
     </button>
   </mat-card-actions>
   <mat-card-content>
-    <mat-chip-set>
-      <mat-chip *ngFor="let interest of interests"
-        >{{ interest.interest }}
-        <button matChipRemove (click)="deleteInterest(interest.id)">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-chip>
-    </mat-chip-set>
+    <div class="yourport-chipset">
+      <div class="yourport-chip flex-center" *ngFor="let interest of interests">
+        {{ interest.interest }}
+        <mat-icon (click)="deleteInterest(interest.id)" class="delete-chip-btn">close</mat-icon>
+      </div>
+    </div>
   </mat-card-content>
 </mat-card>

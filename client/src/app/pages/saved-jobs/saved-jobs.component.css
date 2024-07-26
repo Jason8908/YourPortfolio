@@ -1,3 +1,7 @@
+html {
+  --mat-paginator-disabled-icon-color: white;
+}
+
 .no-results {
   width: 100%;
   text-align: center;
@@ -14,6 +18,7 @@
     );
   overflow-y: scroll;
   border-top: #666 2px solid;
+  background-color: #101010;
 }
 
 .saved-container::-webkit-scrollbar {
@@ -34,4 +39,9 @@
   justify-content: center;
   align-items: center;
   height: 50vh;
+}
+
+.yourport-paginator {
+  background-color: #101010;
+  color: white;
 }

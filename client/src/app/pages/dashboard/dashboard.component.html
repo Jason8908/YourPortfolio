@@ -4,8 +4,10 @@
   <a routerLink="/dashboard/jobs">View Jobs</a>
 </nav> -->
 <div class="dashboard-container">
-  <h1>Find Your Next Job</h1>
-  <mat-card>
+  <h1 class="heading apercu-font">
+    Find Your Next <span class="emphasize-color">Job</span>
+  </h1>
+  <mat-card class="yourport-card">
     <div class="card-padding">
       <app-job-search (newSearch)="onSearch($event)"></app-job-search>
     </div>

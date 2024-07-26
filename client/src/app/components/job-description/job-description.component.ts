@@ -48,9 +48,6 @@ export class JobDescriptionComponent {
   @Output() onAIReturn = new EventEmitter<void>();
   loading: boolean = false;
   constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
-  ngOnInit() {
-    console.log(this.balance);
-  }
   generateCoverLetter(jobData: JobData, selectedAIModel: string | undefined) {
     this.loading = true;
     this.apiService
@@ -103,7 +100,7 @@ export class JobDescriptionComponent {
 
   promptAIModelSelection(jobData: JobData, type: string) {
     const dialogRef = this.dialog.open(CoverLetterDialogComponent, {
-      data: { credits: this.balance },
+      data: { credits: this.balance, type: type === 'letter' ? 'Cover Letter' : 'Resume' },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

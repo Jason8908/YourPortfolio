@@ -1,4 +1,4 @@
-import { Component, inject, Inject, model, OnInit } from '@angular/core';
+import { Component, inject, Inject, Input, model, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';

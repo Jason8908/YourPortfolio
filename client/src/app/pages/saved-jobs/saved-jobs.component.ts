@@ -33,6 +33,7 @@ export class SavedJobsComponent {
   public loading: boolean = true;
   triggerCreditsRefresh: Subject<void> = new Subject<void>();
   balance: number = 0;
+background: any;
 
   constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
 

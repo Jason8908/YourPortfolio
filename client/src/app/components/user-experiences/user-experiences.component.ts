@@ -10,12 +10,12 @@ import { AddUserExperienceDialogComponent } from '../add-user-experience-dialog/
 import { MatDialog } from '@angular/material/dialog';
 import { ApiService } from '../../services/api.service';
 import { LocalStorageService } from '../../services/local-storage.service';
-import { Router } from '@angular/router';
 import { User } from '../../classes/user';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-user-experiences',
@@ -30,6 +30,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatExpansionModule,
     MatChipsModule,
     MatCardModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './user-experiences.component.html',
   styleUrl: './user-experiences.component.css',
@@ -38,16 +39,17 @@ export class UserExperiencesComponent {
   user: User | null;
   experiences: Array<UserExperience> = [];
   readonly dialog = inject(MatDialog);
+  loading: boolean = false;
   constructor(
     private apiService: ApiService,
     private localStorage: LocalStorageService,
-    private router: Router,
     private snackbar: MatSnackBar
   ) {
     this.user = this.localStorage.getUser();
   }
 
   updateUserExperiences(): any {
+    this.loading = true;
     this.apiService.getUserExperiences().subscribe({
       next: (response) => {
         const result = response.data as ExperienceList;
@@ -58,8 +60,10 @@ export class UserExperiencesComponent {
             experience.endDate = new Date(experience.endDate);
           }
         }
+        this.loading = false;
       },
       error: (err) => {
+        this.loading = false;
         this.snackbar.open(`Error: Could not update user experience`, 'OK');
       },
     });
@@ -70,15 +74,19 @@ export class UserExperiencesComponent {
   }
 
   addExperience() {
+    if (this.loading) return;
     let dialogRef = this.dialog.open(AddUserExperienceDialogComponent, {
       width: '800px',
     });
     dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+      this.loading = true;
       this.apiService.addUserExperience(result).subscribe(
         () => {
           this.updateUserExperiences();
         },
         (error) => {
+          this.loading = false;
           console.log(`Error adding user experience: ${JSON.stringify(error)}`);
           this.snackbar.open(`Error adding user experience`, `OK`);
         }
@@ -87,17 +95,20 @@ export class UserExperiencesComponent {
   }
 
   updateExperience(expData: UserExperience) {
+    if (this.loading) return;
     let dialogRef = this.dialog.open(AddUserExperienceDialogComponent, {
       width: '800px',
       data: { ...expData },
     });
     dialogRef.afterClosed().subscribe((result) => {
-      if (result == null) return;
+      if (!result) return;
+      this.loading = true;
       this.apiService.updateUserExperience(result).subscribe(
         () => {
           this.updateUserExperiences();
         },
         (error) => {
+          this.loading = false;
           console.log(
             `Error updating user experience: ${JSON.stringify(error)}`
           );
@@ -108,6 +119,7 @@ export class UserExperiencesComponent {
   }
 
   deleteExperience(experienceId: Number) {
+    if (this.loading) return;
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         message: 'Are you sure you want to delete this experience?',
@@ -115,6 +127,7 @@ export class UserExperiencesComponent {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
+        this.loading = true;
         this.apiService
           .deleteUserExperience(experienceId)
           .subscribe(
@@ -122,6 +135,7 @@ export class UserExperiencesComponent {
               this.updateUserExperiences();
             },
             (error) => {
+              this.loading = false;
               console.log(
                 `Error deleting user experience: ${JSON.stringify(error)}`
               );

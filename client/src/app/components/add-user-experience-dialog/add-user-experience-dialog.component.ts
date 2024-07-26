@@ -6,11 +6,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { UserExperience } from '../../classes/experiences';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-add-user-experience-dialog',
   standalone: true,
   imports: [
+    NgIf,
     MatDialogModule,
     MatInputModule,
     FormsModule,

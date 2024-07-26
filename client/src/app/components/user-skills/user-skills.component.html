@@ -1,21 +1,24 @@
 <mat-card appearance="outlined">
   <mat-card-header>
-    <mat-card-title>Skills</mat-card-title>
+    <mat-card-title>
+      <div class="yourport-card-title">
+        <div>Skills</div>
+        <mat-spinner class="yourport-spinner-sm" *ngIf="loading"></mat-spinner>
+      </div>
+    </mat-card-title>
   </mat-card-header>
   <mat-card-actions>
-    <button mat-button (click)="addSkill()">
-      Add Skill
-      <mat-icon>add</mat-icon>
+    <button mat-button (click)="addSkill()" [disabled]="loading">
+      <span class="emphasize-teal font-bold">Add Skill</span>
+      <mat-icon class="emphasize-teal">add</mat-icon>
     </button>
   </mat-card-actions>
   <mat-card-content>
-    <mat-chip-set>
-      <mat-chip *ngFor="let skill of skills"
-        >{{ skill.name }}
-        <button matChipRemove (click)="deleteSkill(skill.id)">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-chip>
-    </mat-chip-set>
+    <div class="yourport-chipset">
+      <div class="yourport-chip flex-center" *ngFor="let skill of skills">
+        {{ skill.name }}
+        <mat-icon (click)="deleteSkill(skill.id)" class="delete-chip-btn">close</mat-icon>
+      </div>
+    </div>
   </mat-card-content>
 </mat-card>

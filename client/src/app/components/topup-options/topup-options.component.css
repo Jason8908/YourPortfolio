@@ -35,3 +35,19 @@ mat-card-actions {
   justify-content: center;
   height: 400px;
 }
+
+mat-card {
+  background-color: black;
+  border-style: solid;
+  border-color: white;
+  border-width: 1px;
+}
+
+.purchase-button {
+  transition-property: all;
+  transition-duration: 100ms;
+}
+
+.purchase-button:hover {
+  transform: scale(1.1);
+}
