@@ -7,7 +7,7 @@
       <span class="emphasize-teal">{{ jobData.employer }}</span>
     </mat-card-subtitle>
   </mat-card-header>
-  <hr />
+  <br />
   <mat-card-actions class="job-buttons">
     <button
       color="accent"
@@ -32,7 +32,7 @@
     </button>
     <mat-spinner *ngIf="loading" class="ai-spinner"></mat-spinner>
   </mat-card-actions>
-  <hr />
+  <br />
   <mat-card-content *ngIf="jobData.attributes && jobData.attributes.length > 0">
     <p>Skills Required For Position</p>
     <div class="yourport-chipset">
@@ -41,7 +41,7 @@
       </div>
     </div>
   </mat-card-content>
-  <hr *ngIf="jobData.attributes && jobData.attributes.length > 0" />
+  <br *ngIf="jobData.attributes && jobData.attributes.length > 0" />
   <mat-card-content *ngIf="jobData.benefits && jobData.benefits.length > 0">
     <p>Benefits</p>
     <div class="yourport-chipset">
@@ -50,7 +50,7 @@
       </div>
     </div>
   </mat-card-content>
-  <hr *ngIf="jobData.benefits && jobData.benefits.length > 0" />
+  <br *ngIf="jobData.benefits && jobData.benefits.length > 0" />
   <mat-card-content>
     <div class="job-description" [innerHTML]="jobData.description"></div>
   </mat-card-content>

@@ -70,6 +70,9 @@ export class JobDescriptionComponent {
         document.body.removeChild(link);
         // Emit an event to refresh the user's balance
         this.onAIReturn.emit();
+      }, () => {
+        this.loading = false;
+        this.snackbar.open(`Error generating cover letter.`, 'OK');
       });
   }
 
@@ -95,6 +98,9 @@ export class JobDescriptionComponent {
         document.body.removeChild(link);
         // Emit an event to refresh the user's balance
         this.onAIReturn.emit();
+      }, () => {
+        this.loading = false;
+        this.snackbar.open(`Error generating resume.`, 'OK');
       });
   }
 
@@ -118,28 +124,34 @@ export class JobDescriptionComponent {
   }
 
   saveJob(jobId: number) {
+    this.loading = true;
     this.apiService.saveJob(jobId).subscribe({
       next: (res) => {
         this.jobData.saved = true;
+        this.loading = false;
         this.snackbar.open('Job Saved!', 'OK', {
           duration: 5000,
         });
       },
       error: (err) => {
+        this.loading = false;
         this.snackbar.open(`Error: ${err.message}`, 'OK');
       },
     });
   }
 
   unsaveJob(jobId: number) {
+    this.loading = true;
     this.apiService.unsaveJob(jobId).subscribe({
       next: (res) => {
+        this.loading = false;
         this.jobData.saved = false;
         this.snackbar.open('Job Unsaved!', 'OK', {
           duration: 5000,
         });
       },
       error: (err) => {
+        this.loading = false;
         this.snackbar.open(`Error: ${err.message}`, 'OK');
       },
     });

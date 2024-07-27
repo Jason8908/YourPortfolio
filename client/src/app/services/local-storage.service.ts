@@ -23,12 +23,4 @@ export class LocalStorageService {
   clear(): void {
     localStorage.clear();
   }
-
-  setUser(user: User): void {
-    this.setItem('user', user);
-  }
-
-  getUser(): User | null {
-    return this.getItem('user') as User | null;
-  }
 }
