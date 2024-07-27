@@ -1,73 +1,61 @@
-import puppeteer from "puppeteer";
 import { getSkills } from "./check-skill.js";
 import "dotenv/config"
+import axios from "axios";
 
-const PUPPETTEER_SETTINGS_DEV = {
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  defaultViewport: {
-    width: 1280,
-    height: 800,
-  },
-}
 
-const PUPPETTEER_SETTINGS_PROD = {
-  headless: true,
-  executablePath: '/usr/bin/google-chrome',
-  ignoreDefaultArgs: ['--disable-extensions'],
-  args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  defaultViewport: {
-    width: 1280,
-    height: 800,
-  },
-}
-
-const PUPPETEER_SETTINGS = process.env.PRODUCTION == "true" ? PUPPETTEER_SETTINGS_PROD : PUPPETTEER_SETTINGS_DEV
-
+const API_KEYS = process.env.WINTR_API_KEY.split(",")
 
 async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
   const encodedQuery = encodeURIComponent(jobQuery);
   const encodedLocation = encodeURIComponent(jobLocation);
   const pageParam = page ? `&start=${page * 10}` : "";
 
-  const browser = await puppeteer.launch(PUPPETEER_SETTINGS);
-
   try {
-    const browserPage = await browser.newPage();
 
-    await browserPage.evaluateOnNewDocument(() => {
-      delete navigator.__proto__.webdriver;
-    });
+    const options = {
+      "method": "post",
+      "responseType": "json",
+      "url": "https://api.wintr.com/fetch",
+      "data": {
+        "apikey": API_KEYS[0],
+        "method": "GET",
+        "url": `https://ca.indeed.com/jobs?from=searchOnHP&q=${encodedQuery}&l=${encodedLocation}${pageParam}&spa=1`,
+        "jsrender": true,
+        "outputschema": {
+          "jsonResponse": {
+            "group": "pre",
+            "data": {
+              "jsonResponse": {
+                "selector": "pre",
+                "attr": "*text*"
+              }
+            }
+          }
+        }
+      }
+    }
 
-    await browserPage.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-    );
+    let res = await axios(options).catch(err => console.log(err))
 
-    await browserPage.goto(
-      `https://ca.indeed.com/jobs?from=searchOnHP&q=${encodedQuery}&l=${encodedLocation}${pageParam}&spa=1`,
-    );
-    await browserPage.waitForSelector("pre", { timeout: 2_000 });
+    if (!res) {
+      return null
+    }
 
-    const innerText = await browserPage.evaluate(() => {
-      return JSON.parse(document.querySelector("body").innerText);
-    });
-    await browser.close();
+    let innerText = JSON.parse(res.data.content.jsonResponse[0].jsonResponse)
 
     return Object.keys(innerText.body.jobKeysWithTwoPaneEligibility);
   } catch (err) {
-    await browser.close();
     console.log(err);
   }
 }
 
 async function getIndeedJobsv2({ ids }) {
-  const browser = await puppeteer.launch(PUPPETEER_SETTINGS);
 
   try {
     const jobs = await Promise.all(
-      ids.map(async (id) => await getIndeedJobFromIdv2({ browser, id })),
+      ids.map(async (id, ind) => await getIndeedJobFromIdv2({ id, ind })),
     );
-    await browser.close();
+
     let allAttributesSet = jobs.reduce(
       (acc, curr) => acc.union(new Set(curr.attributes)),
       new Set(),
@@ -90,25 +78,38 @@ async function getIndeedJobsv2({ ids }) {
   }
 }
 
-async function getIndeedJobFromIdv2({ browser, id }) {
-  const browserPage = await browser.newPage();
+async function getIndeedJobFromIdv2({ id, ind }) {
+  const apikey = API_KEYS[ind % API_KEYS.length]
+  const options = {
+    "method": "post",
+    "responseType": "json",
+    "url": "https://api.wintr.com/fetch",
+    "data": {
+      "apikey": apikey,
+      "method": "GET",
+      "url": `https://ca.indeed.com/viewjob?jk=${encodeURIComponent(id)}&spa=1`,
+      "jsrender": true,
+      "outputschema": {
+        "jsonResponse": {
+          "group": "pre",
+          "data": {
+            "jsonResponse": {
+              "selector": "pre",
+              "attr": "*text*"
+            }
+          }
+        }
+      }
+    }
+  }
 
-  await browserPage.evaluateOnNewDocument(() => {
-    delete navigator.__proto__.webdriver;
-  });
+  let res = await axios(options).catch(err => console.log(err))
 
-  await browserPage.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-  );
+  if (!res) {
+    return { err: `Error (apikey=${ind})` }
+  }
 
-  await browserPage.goto(
-    `https://ca.indeed.com/viewjob?jk=${encodeURIComponent(id)}&spa=1`,
-  );
-  await browserPage.waitForSelector("pre", { timeout: 2_000 });
-
-  let jsonResponse = await browserPage.evaluate(() => {
-    return JSON.parse(document.querySelector("body").innerText);
-  });
+  let jsonResponse = JSON.parse(res.data.content.jsonResponse[0].jsonResponse)
 
   return parseIndeedOutput(id, jsonResponse);
 }
@@ -159,54 +160,5 @@ function parseIndeedOutput(externalId, jsonResponse) {
     };
   }
 }
-
-// const jobQuery = "Software Engineer";
-// const jobLocation = "Scarborough, ON";
-// const page = 0
-
-// console.log(await getIndeedJobsIds({ jobQuery, jobLocation, page }))
-
-// getIndeedJobs({ jobQuery, jobLocation, page }).then((res) => {
-//     console.log(typeof res)
-//     fs.writeFile('final.json', JSON.stringify(res), (err) => {
-
-//         // In case of a error throw err.
-//         if (err) throw err;
-//     })
-// })
-
-// const ids = ["922e764e164715d3", "922e764e164715d3", "922e764e164715d3", "922e764e164715d3"]
-
-// let res = await getIndeedJobsv2({ ids });
-// ((res) => {
-//     // console.log(typeof res)
-//     fs.writeFile('final.json', JSON.stringify(res), (err) => {
-
-//         // In case of a error throw err.
-//         if (err) throw err;
-//     })
-// })(res)
-
-// const browser = await puppeteer.launch({
-//     headless: false,
-//     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-//     defaultViewport: {
-//         width: 1280,
-//         height: 800,
-//     },
-// });
-
-// const browserPage = await browser.newPage();
-// await browserPage.setUserAgent(
-//     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-// );
-// await browserPage.goto(`https://ca.indeed.com/viewjob?jk=${encodeURIComponent(ids[0])}&spa=1`);
-// await browserPage.waitForSelector("pre", { timeout: 2_000 });
-
-// let test = await browserPage.evaluate(() => {
-//     return JSON.parse(document.querySelector("body").innerText);
-// });
-
-// console.log(test)
 
 export { getIndeedJobsIds, getIndeedJobsv2 };

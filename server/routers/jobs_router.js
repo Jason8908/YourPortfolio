@@ -10,14 +10,6 @@ import { User } from "../models/users.js";
 
 export const jobsRouter = Router();
 
-const checkSaved = (job) => {
-  if (job.User?.length > 0) {
-    job.saved = true;
-  } else {
-    job.saved = false;
-  }
-};
-
 jobsRouter.get("/search", isAuthenticated, setUserId, async (req, res) => {
   let ids = await getIndeedJobsIds({
     jobQuery: req.query.query,
@@ -29,6 +21,12 @@ jobsRouter.get("/search", isAuthenticated, setUserId, async (req, res) => {
     return res
       .status(HttpStatusCode.TooManyRequests)
       .json({ error: "Please wait until calling this again" });
+  }
+
+  if (ids.err) {
+    return res
+      .status(HttpStatusCode.InternalServerError)
+      .json({ error: ids.err });
   }
 
   let jobs = await Job.findAll({
