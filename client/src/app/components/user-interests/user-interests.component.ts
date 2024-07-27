@@ -33,17 +33,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './user-interests.component.css',
 })
 export class UserInterestsComponent {
-  user: User | null;
   interests: Array<Interest> = [];
   loading: boolean = false;
   readonly dialog = inject(MatDialog);
   constructor(
-    private localStorage: LocalStorageService,
     private apiService: ApiService,
     private snackbar: MatSnackBar
-  ) {
-    this.user = this.localStorage.getUser();
-  }
+  ) { }
 
   updateInterests(): any {
     this.loading = true;

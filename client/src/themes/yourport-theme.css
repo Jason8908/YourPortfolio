@@ -910,8 +910,8 @@ html {
 	--mdc-protected-button-container-shape: 9999px;
 	--mdc-filled-button-container-color: #318078;
 	--mdc-filled-button-label-text-color: #ffffff;
-	--mdc-filled-button-disabled-container-color: rgba(26, 27, 31, 0.12);
-	--mdc-filled-button-disabled-label-text-color: rgba(26, 27, 31, 0.38);
+	--mdc-filled-button-disabled-container-color: #1f524d;
+	--mdc-filled-button-disabled-label-text-color: #cfcfcf;
 	--mdc-filled-button-label-text-font: Roboto, sans-serif;
 	--mdc-filled-button-label-text-size: 0.875rem;
 	--mdc-filled-button-label-text-tracking: 0.006rem;

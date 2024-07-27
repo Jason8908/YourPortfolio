@@ -36,17 +36,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './user-experiences.component.css',
 })
 export class UserExperiencesComponent {
-  user: User | null;
   experiences: Array<UserExperience> = [];
   readonly dialog = inject(MatDialog);
   loading: boolean = false;
   constructor(
     private apiService: ApiService,
-    private localStorage: LocalStorageService,
     private snackbar: MatSnackBar
-  ) {
-    this.user = this.localStorage.getUser();
-  }
+  ) {}
 
   updateUserExperiences(): any {
     this.loading = true;

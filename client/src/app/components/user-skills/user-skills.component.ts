@@ -33,37 +33,30 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './user-skills.component.css',
 })
 export class UserSkillsComponent {
-  user: User | null;
   skills: Array<Skill> = [];
   skillCount: number = 0;
   loading: boolean = false;
   readonly dialog = inject(MatDialog);
   constructor(
     private apiService: ApiService,
-    private localStorage: LocalStorageService,
-    private router: Router,
     private snackBar: MatSnackBar
-  ) {
-    this.user = this.localStorage.getUser();
-  }
+  ) { }
 
   setUserSkills() {
     this.loading = true;
-    if (this.user) {
-      this.apiService.getUserSkills().subscribe(
-        (response) => {
-          const results: SkillList = response.data;
-          this.skills = results.skills;
-          this.skillCount = results.totalCount;
-          this.loading = false;
-        },
-        (error) => {
-          this.loading = false;
-          console.log(`Error with the API: ${JSON.stringify(error)}`);
-          this.snackBar.open(`Error retrieving skills`, 'OK');
-        }
-      );
-    }
+    this.apiService.getUserSkills().subscribe(
+      (response) => {
+        const results: SkillList = response.data;
+        this.skills = results.skills;
+        this.skillCount = results.totalCount;
+        this.loading = false;
+      },
+      (error) => {
+        this.loading = false;
+        console.log(`Error with the API: ${JSON.stringify(error)}`);
+        this.snackBar.open(`Error retrieving skills`, 'OK');
+      }
+    );
   }
 
   ngOnInit() {

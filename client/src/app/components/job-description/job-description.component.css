@@ -33,7 +33,7 @@
 }
 
 .ai-spinner {
-  width: 10%;
+  transform: scale(0.4);
 }
 
 mat-card {
