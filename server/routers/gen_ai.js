@@ -296,7 +296,7 @@ genAiRouter.post(
     const aiService = new AiService({
       projectId: PROJECT_ID,
       region: REGION,
-      maxOutput: 2500,
+      maxOutput: 8192,
       aiModel: model
     });
     const cost = aiService.getCost();

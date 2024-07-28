@@ -81,19 +81,20 @@ export class AiService {
     const jobDataString = this.createJobDataString(jobData);
     // Creating a resume object
     const resume = new Resume(user.fname, user.lname, user.email);
-    // Starting the AI chat
-    const startResult = await this.startResumeChat(jobDataString);
+    const resumePrompt = this.constructResumePrompt(jobDataString, skills, experiences, educations);
+    // Generate resume information using the prompt
+    const resp = await this.promptText(resumePrompt);
     // Objective
-    const objective = await this.generateResumeObjective();
+    const objective = this.extractResumeObjective(resp.response);
     resume.setObjective(objective);
     // Skills
-    const resumeSkills = await this.generateResumeSkills(skills);
+    const resumeSkills = this.extractResumeSkills(resp.response);
     resume.setSkills(resumeSkills);
     // Education
-    const resumeEducations = await this.generateResumeEducations(educations);
+    const resumeEducations = this.extractResumeEducations(resp.response, educations);
     resume.setEducations(resumeEducations);
     // Experiences
-    const resumeExperiences = await this.generateResumeExperiences(experiences);
+    const resumeExperiences = this.extractResumeExperiences(resp.response, experiences);
     resume.setExperiences(resumeExperiences);
     return resume;
   }
@@ -101,40 +102,82 @@ export class AiService {
     this.startChat();
     const prompt = `Here is a job posting: ${jobDataString}\n
                     I will ask you a series of questions to generate a resume that fits this job posting.\n
-                    Do not send any text other than the answers to the questions.\n
-                    Respond with only 'OK' to start.\n`;
-    const resp = await this.sendMessage(prompt);
-    return resp.response;
-  }
-  async generateResumeObjective() {
-    if (!this.chat)
-      throw new Error("Chat not started. Start chat first using the .startChat() method.");
-    const prompt = `Generate an objective statement for the job posting mentioned previously that will be put on a resume.\n
-                  Do not send any text other than the obejctive statement itself.\n`;
-    const resp = await this.sendMessage(prompt);
-    return resp.response;
-  }
-  async generateResumeSkills(skills) {
-    if (!this.chat)
-      throw new Error("Chat not started. Start chat first using the .startChat() method.");
-    const prompt = `Here is a list of skills that I possess: ${skills.join(", ")}\n
-                    Generate a list of exactly 6 skills that are relevant to the job posting seperated by commas.
-                    Do not send any text other than the skills as comma serpated values.\n`;
-    const resp = await this.sendMessage(prompt);
-    const result = resp.response[0].split(",").map(item => item.trim());
-    return result;
-  }
-  async generateResumeEducations(educations) {
-    if (!this.chat)
-      throw new Error("Chat not started. Start chat first using the .startChat() method.");
-    const educationOptions = this.generateEducationOptionsString(educations);
-    const prompt = `Here is a list of my education: ${educationOptions}\n
+                    Do not send any text other than the answers to the questions.
+                    For each of the following questions, wrap the response to the question like so:\n
+                    =====[Question Number].=====\n
+                    (Your response)\n
+                    ==========\n
+                    Note that there are FIVE '=' symbols before and after the question number and TEN '=' symbols marking the end of a response.\n
+                    Here are the questions:\n
+                    1. Generate an objective statement for the job posting mentioned previously that will be put on a resume.\n
+                    Do not send any text other than the obejctive statement itself.\n
+                    2. Here is a list of skills that I possess: ${skills.join(", ")}\n
+                    Generate a list of exactly 6 skills that are relevant to the job posting seperated by commas.\n
+                    Do not send any text other than the skills as comma serpated values.\n
+                    3. Here is a list of my previous education: ${educationOptions}\n
                     Generate a list of at most 3 education entries that are most relevant to the job posting.\n
-                    Return this data as a list of numbers representing the order in which the options were presented in seperated by commas.\n
-                    Do not send any text other than the numbers themselves.\n`;
+                    4. Here is a list of my experiences: ${experienceOptions}\n
+                    Generate a list of at most 3 experience entries that are most relevant to the job posting.\n
+                    For each of these entries, generate a list of at most 5 bullet points that describe this experience.\n
+                    To the best of your ability, extrapolate information from my experience that may be relevant to the job posting.\n
+                    However, make the points relevant to the job posting.\n
+                    Return this data as a list of sentences seperated by new lines.\n
+                    Do not send any text other than the sentences themselves.\n
+                    For this question, return the data as follows:\n
+                    {Experience Number}.\n
+                    (Your responses)\n`;
     const resp = await this.sendMessage(prompt);
-    const result = resp.response;
-    const educationIndices = result[0].split(",").map(item => +(item.trim())).filter(item => !isNaN(item));
+    return resp.response;
+  }
+  extractResumeObjective(response) {
+    let objective = "";
+    let start = false;
+    for (const line of response) {
+      if (line === "=====[1].=====") {
+        start = true;
+        continue;
+      }
+      if (line === "==========" && start) {
+        start = false;
+        break;
+      }
+      if (start)
+        objective += line + "\n";
+    }
+    return objective.trim();
+  }
+  extractResumeSkills(response) {
+    let skills = [];
+    let start = false;
+    for (const line of response) {
+      if (line === "=====[2].=====") {
+        start = true;
+        continue;
+      }
+      if (line === "==========" && start) {
+        start = false;
+        break;
+      }
+      if (start)
+        skills.push(...(line.split(",").map(item => item.trim())));
+    }
+    return skills;
+  }
+  extractResumeEducations(response, educations) {
+    let educationIndices = [];
+    let start = false;
+    for (const line of response) {
+      if (line === "=====[3].=====") {
+        start = true;
+        continue;
+      }
+      if (line === "==========" && start) {
+        start = false;
+        break;
+      }
+      if (start)
+        educationIndices = line.split(",").map(item => +(item.trim())).filter(item => !isNaN(item));
+    }
     // Extracting the selected educations
     const selectedEducations = educations.filter((_, index) => educationIndices.includes(index + 1));
     let resumeEducations = [];
@@ -152,30 +195,48 @@ export class AiService {
     }
     return resumeEducations;
   }
-  async generateResumeExperiences(experiences) {
-    if (!this.chat)
-      throw new Error("Chat not started. Start chat first using the .startChat() method.");
-    const experienceOptions = this.generateExperienceOptionsString(experiences);
-    const prompt = `Here is a list of my experiences: ${experienceOptions}\n
-                    Generate a list of at most 3 experience entries that are most relevant to the job posting.\n
-                    Return this data as a list of numbers representing the order in which the options were presented in seperated by commas.\n
-                    Do not send any text other than the numbers themselves.\n`;
-    const resp = await this.sendMessage(prompt);
-    const result = resp.response;
-    const experienceIndices = result[0].split(",").map(item => +(item.trim()));
+  extractResumeExperiences(response, experiences) {
+    let experiencePoints = [], currPoints = [], experienceIndices = [];
+    let currExperience = -1, start = false;
+    const matchNumber = /\d+\./;
+    for (const line of response) {
+      if (line === "=====[4].=====") {
+        start = true;
+        continue;
+      }
+      if (line === "==========" && start) {
+        if (currExperience > 0) {
+          experiencePoints[currExperience - 1] = currPoints;
+        }
+        start = false;
+        break;
+      }
+      if (start) {
+        if (matchNumber.test(line)) {
+          if (currExperience > 0) {
+            experiencePoints[currExperience - 1] = currPoints;
+          }
+          currExperience = +(line.split(".")[0]);
+          if (isNaN(currExperience))
+            currExperience = -1;
+          experienceIndices.push(currExperience);
+          currPoints = [];
+          continue;
+        }
+        currPoints.push(line);
+      }
+    }
     // Extracting the selected experiences
-    const selectedExperiences = experiences.filter((_, index) => experienceIndices.includes(index + 1));
+    const selectedExperiences = experiences.map((exp, index) => {
+      if (experienceIndices.includes(index + 1))
+        return {
+          ...exp,
+          points: experiencePoints[index],
+        };
+      return exp;
+    }).filter((_, index) => experienceIndices.includes(index + 1));
     let resumeExperiences = [];
     for (const experience of selectedExperiences) {
-      const experienceString = this.generateExperienceString(experience);
-      const experiencePointsPrompt = `Here is an experience I have: ${experienceString}\n
-                                      Generate a list of at most 5 bullet points that describe this experience.\n
-                                      To the best of your ability, extrapolate information from my experience that may be relevant to the job posting.\n
-                                      However, make the points relevant to the job posting.\n
-                                      Return this data as a list of sentences seperated by new lines.\n
-                                      Do not send any text other than the sentences themselves.\n`;
-      const expResp = await this.sendMessage(experiencePointsPrompt);
-      const points = expResp.response;
       const startDateString = this.formatDate(experience.startDate);
       const endDateString = experience.endDate ? this.formatDate(experience.endDate) : "Present";
       resumeExperiences.push({
@@ -183,7 +244,7 @@ export class AiService {
         company: experience.company,
         startDate: startDateString,
         endDate: endDateString,
-        points,
+        points: experience.points || [],
       });
     }
     return resumeExperiences;
@@ -226,6 +287,37 @@ export class AiService {
     const startDate = experience.startDate.toLocaleDateString();
     const endDate = experience.endDate ? experience.endDate.toLocaleDateString() : "Present";
     return `${experience.position} at ${experience.company} from ${startDate} to ${endDate}.`;
+  }
+  constructResumePrompt(jobDataString, skills, experiences, educations) {
+    const educationOptions = this.generateEducationOptionsString(educations);
+    const experienceOptions = this.generateExperienceOptionsString(experiences);
+    const prompt = `Here is a job posting: ${jobDataString}\n
+                    I will ask you a series of questions to generate a resume that fits this job posting.\n
+                    Do not send any text other than the answers to the questions.
+                    For each of the following questions, wrap the response to the question like so:\n
+                    =====[Question Number].=====\n
+                    (Your response)\n
+                    ==========\n
+                    Here are the questions:\n
+                    1. Generate an objective statement for the job posting mentioned previously that will be put on a resume.\n
+                    Do not send any text other than the obejctive statement itself.\n
+                    2. Here is a list of skills that I possess: ${skills.join(", ")}\n
+                    Generate a list of exactly 6 skills that are relevant to the job posting seperated by commas.\n
+                    Do not send any text other than the skills as comma serpated values.\n
+                    3. Here is a list of my previous education: ${educationOptions}\n
+                    Generate a list of at most 3 education entries that are most relevant to the job posting.\n
+                    Return this data as a list of numbers representing the order in which the options were presented in seperated by commas.\n
+                    4. Here is a list of my experiences: ${experienceOptions}\n
+                    Generate a list of at most 3 experience entries that are most relevant to the job posting.\n
+                    For each of these entries, generate a list of at most 3 bullet points that describe this experience.\n
+                    To the best of your ability, extrapolate information from my experience that may be relevant to the job posting.\n
+                    However, make the points relevant to the job posting.\n
+                    Return this data as a list of sentences seperated by new lines.\n
+                    Do not send any text other than the sentences themselves.\n
+                    For this question, return the data as follows:\n
+                    {Experience Number}.\n
+                    (Your responses)\n`;
+    return prompt;
   }
   getCost() {
     return ModelToCost[this.model];
