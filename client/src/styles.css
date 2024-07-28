@@ -257,3 +257,24 @@ mat-dialog-container {
 .mat-mdc-dialog-surface {
   border-style: solid;
 }
+
+.banner {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.banner-yellow {
+  background-color: #ffc800;
+  color: black;
+  padding: 1px;
+}
+
+.yourport-link {
+  color: black;
+  font-weight: 400;
+  text-decoration: underline;
+}
