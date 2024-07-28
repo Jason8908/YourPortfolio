@@ -3,6 +3,17 @@
   <span class="emphasize-teal font-bold">{{data.type}}</span>
 </h2>
 <mat-dialog-content class="mat-typography">
+  <h3 class="font-white">Select {{data.type}} Template</h3>
+  <div class="template-select-container">
+    <!-- Cover Letter Templates -->
+    <div class="cover-letter-template-1 template-option template-option-selected" id="coverLetter1" (click)="selectTemplate(1, 'coverLetter1')" *ngIf="data.type ==='Cover Letter'"></div>
+    <div class="cover-letter-template-2 template-option" id="coverLetter2" (click)="selectTemplate(2, 'coverLetter2')" *ngIf="data.type ==='Cover Letter'"></div>
+    <div class="cover-letter-template-3 template-option" id="coverLetter3" (click)="selectTemplate(3, 'coverLetter3')" *ngIf="data.type ==='Cover Letter'"></div>
+    <!-- Resume Templates -->
+    <div class="resume-template-1 template-option template-option-selected" id="resume1" (click)="selectTemplate(1, 'resume1')" *ngIf="data.type ==='Resume'"></div>
+    <div class="resume-template-2 template-option" id="resume2" (click)="selectTemplate(2, 'resume2')" *ngIf="data.type ==='Resume'"></div>
+    <div class="resume-template-3 template-option" id="resume3" (click)="selectTemplate(3, 'resume3')" *ngIf="data.type ==='Resume'"></div>
+  </div>
   <h3 class="font-white">Select AI Model</h3>
   <mat-radio-group [(ngModel)]="selectedAIModel">
     <mat-radio-button [value]="aiModels.Gemini15Flash" [checked]="true">
@@ -17,5 +28,5 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button [mat-dialog-close]="false" cdkFocusInitial>Cancel</button>
-  <button mat-button [mat-dialog-close]="selectedAIModel()">Confirm</button>
+  <button mat-button [mat-dialog-close]="returnResult()">Confirm</button>
 </mat-dialog-actions>

@@ -554,7 +554,7 @@ html {
 	--mdc-dialog-supporting-text-tracking: 0.016rem;
 	--mdc-dialog-container-shape: 10px;
 	--mat-dialog-container-elevation-shadow: none;
-	--mat-dialog-container-max-width: 560px;
+	--mat-dialog-container-max-width: 1000px;
 	--mat-dialog-container-small-max-width: calc(100vw - 32px);
 	--mat-dialog-container-min-width: 280px;
 	--mat-dialog-actions-alignment: flex-end;

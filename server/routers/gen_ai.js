@@ -7,7 +7,7 @@ import { User } from "../models/users.js";
 import { UserSkill } from "../models/userSkills.js";
 import { Skill } from "../models/skills.js";
 import { UserExperience } from "../models/userexperiences.js";
-import { generateCoverLetterBrown, generateResumeBasic } from "../services/docx.js";
+import { generateCoverLetter, generateResumeBasic, CoverLetterTypes, ResumeTypes } from "../services/docx.js";
 import { CoverLetter } from "../entities/cover-letter.js";
 import { Balance } from "../models/balance.js";
 import stream from "stream";
@@ -209,7 +209,8 @@ genAiRouter.post(
     }
     const paragraphs = result.response;
     const coverLetter = extractCoverLetterData(paragraphs, user, jobData);
-    const buffer = await generateCoverLetterBrown(coverLetter);
+    const letterType = Object.values(CoverLetterTypes).includes(req.query.type) ? req.query.type : CoverLetterTypes.Brown;
+    const buffer = await generateCoverLetter(coverLetter, letterType);
     // Deducting the cost of generating a cover letter from the user's balance
     await deductAICost(userId, model);
     // Returning the generated cover letter as a docx file over Express
@@ -320,8 +321,9 @@ genAiRouter.post(
       }
       return next(err);
     }
+    const type = Object.values(ResumeTypes).includes(req.query.type) ? req.query.type : ResumeTypes.Basic
     // Creating the resume as a docx file
-    const buffer = await generateResumeBasic(resume);
+    const buffer = await generateResumeBasic(resume, type);
     // Deducting the cost of generating a resume from the user's balance
     await deductAICost(userId, model);
     // Returning the generated resume as a docx file over Express

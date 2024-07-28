@@ -48,10 +48,10 @@ export class JobDescriptionComponent {
   @Output() onAIReturn = new EventEmitter<void>();
   loading: boolean = false;
   constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
-  generateCoverLetter(jobData: JobData, selectedAIModel: string | undefined) {
+  generateCoverLetter(jobData: JobData, selectedAIModel: string | undefined, selectedTemplate: string | undefined) {
     this.loading = true;
     this.apiService
-      .generateCoverLetter(jobData, selectedAIModel)
+      .generateCoverLetter(jobData, selectedAIModel, selectedTemplate)
       .subscribe((response) => {
         this.loading = false;
         const buffer = response as Uint8Array;
@@ -70,16 +70,20 @@ export class JobDescriptionComponent {
         document.body.removeChild(link);
         // Emit an event to refresh the user's balance
         this.onAIReturn.emit();
-      }, () => {
+      }, (err) => {
         this.loading = false;
+        if (err.status === 429) {
+          this.snackbar.open(`Received too many requests in one minute for this model. Please try again later or choose a different model.`, 'OK');
+          return;
+        }
         this.snackbar.open(`Error generating cover letter.`, 'OK');
       });
   }
 
-  generateResume(jobData: JobData, selectedAIModel: string | undefined) {
+  generateResume(jobData: JobData, selectedAIModel: string | undefined, selectedTemplate: string | undefined) {
     this.loading = true;
     this.apiService
-      .generateResume(jobData, selectedAIModel)
+      .generateResume(jobData, selectedAIModel, selectedTemplate)
       .subscribe((response) => {
         this.loading = false;
         const buffer = response as Uint8Array;
@@ -98,8 +102,12 @@ export class JobDescriptionComponent {
         document.body.removeChild(link);
         // Emit an event to refresh the user's balance
         this.onAIReturn.emit();
-      }, () => {
+      }, (err) => {
         this.loading = false;
+        if (err.status === 429) {
+          this.snackbar.open(`Received too many requests in one minute for this model. Please try again later or choose a different model.`, 'OK');
+          return;
+        }
         this.snackbar.open(`Error generating resume.`, 'OK');
       });
   }
@@ -111,12 +119,13 @@ export class JobDescriptionComponent {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
+        const { selectedAIModel, selectedType } = result;
         switch (type) {
           case 'letter':
-            this.generateCoverLetter(jobData, result);
+            this.generateCoverLetter(jobData, selectedAIModel, selectedType);
             break;
           case 'resume':
-            this.generateResume(jobData, result);
+            this.generateResume(jobData, selectedAIModel, selectedType);
             break;
         }
       }
