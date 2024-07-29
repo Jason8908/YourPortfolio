@@ -3,17 +3,16 @@ import { isAuthenticated, setUserId } from "../middleware/auth.js";
 import { HttpStatusCode } from "axios";
 import { ApiResponse } from "../entities/response.js";
 import "dotenv/config";
-import { VertexAI } from "@google-cloud/vertexai";
 import { User } from "../models/users.js";
 import { UserSkill } from "../models/userSkills.js";
 import { Skill } from "../models/skills.js";
 import { UserExperience } from "../models/userexperiences.js";
-import { generateCoverLetterBrown, generateResumeBasic } from "../services/docx.js";
+import { generateCoverLetter, generateResumeBasic, CoverLetterTypes, ResumeTypes } from "../services/docx.js";
 import { CoverLetter } from "../entities/cover-letter.js";
 import { Balance } from "../models/balance.js";
 import stream from "stream";
-import { Resume } from "../entities/resume.js";
 import { UserEducation } from "../models/usereducation.js";
+import { AiService } from "../services/ai.js";
 
 const PROJECT_ID = process.env.PROJECT_ID;
 const REGION = process.env.GOOGLE_REGION;
@@ -63,53 +62,9 @@ const getUserEducation = async (userId) => {
   }));
 };
 
-const generateEducationOptionsString = (educations) => {
-  let result = "";
-  for (let i = 0; i < educations.length; i++)
-    result += `${i+1}. ${educations[i].degree} in ${educations[i].major} at ${educations[i].school}\n`;
-  return result;
-};
-
-const generateExperienceOptionsString = (experiences) => {
-  let result = "";
-  for (let i = 0; i < experiences.length; i++)
-    result += `${i+1}. ${experiences[i].position} at ${experiences[i].company}\n`;
-  return result;
-}
-
-const generateExperienceString = (experience) => {
-  const startDate = experience.startDate.toLocaleDateString();
-  const endDate = experience.endDate ? experience.endDate.toLocaleDateString() : "Present";
-  return `${experience.position} at ${experience.company} from ${startDate} to ${endDate}.`;
-}
-
-const createUserExperienceString = (experiences) => {
-  return experiences
-    .map((experience) => {
-      const startDate = experience.startDate.toLocaleDateString();
-      const endDate = experience.endDate
-        ? experience.endDate.toLocaleDateString()
-        : "Present";
-      return `${experience.position} at ${experience.company} from ${startDate} to ${endDate}. Description: ${experience.description}`;
-    })
-    .join("\n");
-};
-
 const getUser = async (userId) => {
   const user = await User.findByPk(userId);
   return user;
-};
-
-const createJobDataString = (jobData) => {
-  if (!jobData) return "";
-  const position = jobData.title || "";
-  const company = jobData.employer || "";
-  let description = (jobData.description || "").split("\n");
-  for (let i = 0; i < description.length; i++) {
-    description[i] = description[i].trim();
-    description[i] = description[i].replace(/<[^>]*>?/gm, "");
-  }
-  return `${position || "Some position"} at ${company || "some company"}. Description: ${description.join("\n")}`;
 };
 
 const extractCoverLetterData = (
@@ -151,35 +106,6 @@ const extractCoverLetterData = (
     location,
     letterParagraphs,
   );
-};
-
-const promptVertexCoverLetter = async (
-  user,
-  experiences,
-  jobData,
-  skills,
-  aiModel,
-) => {
-  const experiencesString = createUserExperienceString(experiences);
-  const jobDataString = createJobDataString(jobData);
-  // LLM Prompt to generate cover letter
-  const prompt = `My name is ${user.fname} ${user.lname}. Write a cover letter for me; do not place any tokens in it.\n
-    ${jobDataString ? `The following is the job posting: \n${jobDataString}. \n` : ""}
-    ${skills.length > 0 ? `My Skills: ${skills.join(", ")}. \n` : ""}
-    ${experiencesString.length > 0 ? `Experiences: ${experiencesString}. \n` : ""}
-    Do not include any text other than the actual cover letter itself.\n
-    Do not include any placeholders or text that I may need to replace; absolutely NO '[' or ']' symbols; if there is missing information, make it generic and generally applicable.\n
-    The cover letter must have an introduction, two body paragraphs, and a conclusion.\n
-    Do NOT include the location where the job posting was found.\n
-    Do NOT include the introductory line "Dear Hiring Manager" or the farewell line.\n`;
-  const vertexAI = new VertexAI({ project: PROJECT_ID, location: REGION });
-  const generativeModel = vertexAI.getGenerativeModel({
-    model: aiModel,
-  });
-  const resp = await generativeModel.generateContent(prompt);
-  const content = resp.response;
-  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  return result;
 };
 
 const deductAICost = async (userId, model) => {
@@ -251,7 +177,15 @@ genAiRouter.post(
     const balance = await getUserBalance(userId);
     const modelParam = req.query.model || "gemini-flash-1.5";
     const model = ModelLabelToVersion[modelParam] || "gemini-1.5-flash-001";
-    const cost = ModelToCost[model];
+    // Creating an instance of the AI service
+    const aiService = new AiService({
+      projectId: PROJECT_ID,
+      region: REGION,
+      maxOutput: 2500,
+      aiModel: model
+    });
+    const cost = aiService.getCost();
+    // Checking if the user has enough credits to generate a cover letter with the selected model
     if (balance < cost)
       return res
         .status(HttpStatusCode.BadRequest)
@@ -261,15 +195,22 @@ genAiRouter.post(
             "Insufficient credits to generate a cover letter with the selected model.",
           ),
         );
-    const paragraphs = await promptVertexCoverLetter(
-      skills,
-      experiences,
-      jobData,
-      skills,
-      model,
-    );
+    let result = undefined;
+    try {
+      result = await aiService.generateCoverLetter(user, skills, experiences, jobData);
+    }
+    catch(err) {
+      if (err.message.includes('429') || err.message.includes('Quota exceeded')) {
+        return res
+          .status(HttpStatusCode.TooManyRequests)
+          .json(new ApiResponse(HttpStatusCode.TooManyRequests, "Too many requests received in one minute for this model. Please try again later or choose a different model."));
+      }
+      return next(err);
+    }
+    const paragraphs = result.response;
     const coverLetter = extractCoverLetterData(paragraphs, user, jobData);
-    const buffer = await generateCoverLetterBrown(coverLetter);
+    const letterType = Object.values(CoverLetterTypes).includes(req.query.type) ? req.query.type : CoverLetterTypes.Brown;
+    const buffer = await generateCoverLetter(coverLetter, letterType);
     // Deducting the cost of generating a cover letter from the user's balance
     await deductAICost(userId, model);
     // Returning the generated cover letter as a docx file over Express
@@ -287,102 +228,6 @@ genAiRouter.post(
     return next();
   },
 );
-
-const formatDate = (date) => {
-  // Return the date in the format "Month Year"
-  return `${date.toLocaleString("default", {
-    month: "long",
-  })} ${date.getFullYear()}`;
-}
-
-const generateResumeObjective = async (vertex, jobDataString) => {
-  const prompt = `Here is a job posting: ${jobDataString}\n
-                  Generate an object statement for this job posting that will be put on a resume.\n
-                  Do not send any text other than the obejctive statement itself.\n`;
-  const resp = await vertex.generateContent(prompt);
-  const content = resp.response;
-  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  return result[0];
-};
-
-const generateResumeSkills = async (vertex, jobDataString, skills) => {
-  const prompt = `Here is a job posting: ${jobDataString}\n
-                  Here is a list of skills that I possess: ${skills.join(", ")}\n
-                  Generate a list of exactly 6 skills that are relevant to the job posting seperated by commas.
-                  Do not send any text other than the skills as comma serpated values.\n`;
-  const resp = await vertex.generateContent(prompt);
-  const content = resp.response;
-  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  return result[0].split(",").map(item => item.trim()).filter(item => item.length > 0);
-}
-
-const generateResumeEducations = async (vertex, jobDataString, educations) => {
-  const educationOptions = generateEducationOptionsString(educations);
-  const prompt = `Here is a job posting: ${jobDataString}\n
-                  Here is a list of my education: ${educationOptions}\n
-                  Generate a list of at most 3 education entries that are most relevant to the job posting.\n
-                  Return this data as a list of numbers representing the order in which the options were presented in seperated by commas.\n
-                  Do not send any text other than the numbers themselves.\n`;
-  const resp = await vertex.generateContent(prompt);
-  const content = resp.response;
-  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  const educationIndices = result[0].split(",").map(item => +(item.trim())).filter(item => !isNaN(item));
-  // Extracting the selected educations
-  const selectedEducations = educations.filter((_, index) => educationIndices.includes(index + 1));
-  let resumeEducations = [];
-  for (const education of selectedEducations) {
-    const degreeArr = [education.degree, education.major].filter(item => item);
-    const startDateString = formatDate(education.startDate);
-    const endDateString = education.endDate ? formatDate(education.endDate) : "Present";
-    resumeEducations.push({
-      degree: degreeArr.join(", "),
-      institution: education.school,
-      startDate: startDateString,
-      endDate: endDateString,
-      points: [education.description],
-    });
-  }
-  return resumeEducations;
-}
-
-const generateResumeExperiences = async (vertex, jobDataString, experiences) => {
-  const experienceOptions = generateExperienceOptionsString(experiences);
-  const prompt = `Here is a job posting: ${jobDataString}\n
-                  Here is a list of my experiences: ${experienceOptions}\n
-                  Generate a list of at most 3 experience entries that are most relevant to the job posting.\n
-                  Return this data as a list of numbers representing the order in which the options were presented in seperated by commas.\n
-                  Do not send any text other than the numbers themselves.\n`;
-  const resp = await vertex.generateContent(prompt);
-  const content = resp.response;
-  const result = content.candidates.at(0).content.parts.at(0).text.split("\n");
-  const experienceIndices = result[0].split(",").map(item => +(item.trim()));
-  // Extracting the selected experiences
-  const selectedExperiences = experiences.filter((_, index) => experienceIndices.includes(index + 1));
-  let resumeExperiences = [];
-  for (const experience of selectedExperiences) {
-    const experienceString = generateExperienceString(experience);
-    const experiencePointsPrompt = `Here is a job posting: ${jobDataString}\n
-                                    Here is an experience I have: ${experienceString}\n
-                                    Generate a list of at most 5 bullet points that describe this experience.\n
-                                    To the best of your ability, extrapolate information from my experience that may be relevant to the job posting.\n
-                                    However, make the points relevant to the job posting.\n
-                                    Return this data as a list of sentences seperated by new lines.\n
-                                    Do not send any text other than the sentences themselves.\n`;
-    const expResp = await vertex.generateContent(experiencePointsPrompt);
-    const expContent = expResp.response;
-    const points = expContent.candidates.at(0).content.parts.at(0).text.split("\n").map(point => point.trim()).filter(point => point.length > 0);
-    const startDateString = formatDate(experience.startDate);
-    const endDateString = experience.endDate ? formatDate(experience.endDate) : "Present";
-    resumeExperiences.push({
-      position: experience.position,
-      company: experience.company,
-      startDate: startDateString,
-      endDate: endDateString,
-      points,
-    });
-  }
-  return resumeExperiences;
-}
 
 genAiRouter.post(
   "/resume",
@@ -444,11 +289,17 @@ genAiRouter.post(
             "Missing job data in request body.",
           ),
         );
-    const jobDataString = createJobDataString(jobData);
     const balance = await getUserBalance(userId);
     const modelParam = req.query.model || "gemini-flash-1.5";
     const model = ModelLabelToVersion[modelParam] || "gemini-1.5-flash-001";
-    const cost = ModelToCost[model];
+    // Creating an instance of the AI Service
+    const aiService = new AiService({
+      projectId: PROJECT_ID,
+      region: REGION,
+      maxOutput: 8192,
+      aiModel: model
+    });
+    const cost = aiService.getCost();
     if (balance < cost)
       return res
         .status(HttpStatusCode.BadRequest)
@@ -458,27 +309,21 @@ genAiRouter.post(
             "Insufficient credits to generate a resume with the selected model.",
           ),
         );
-    // Creating an instance of the VertexAI client
-    const vertexAI = new VertexAI({ project: PROJECT_ID, location: REGION });
-    const generativeModel = vertexAI.getGenerativeModel({
-      model: model,
-    });
-    // Creating a resume object
-    const resume = new Resume(user.fname, user.lname, user.email);
-    // Objective
-    const objective = await generateResumeObjective(generativeModel, jobDataString);
-    resume.setObjective(objective);
-    // Skills
-    const resumeSkills = await generateResumeSkills(generativeModel, jobDataString, skills);
-    resume.setSkills(resumeSkills);
-    // Education
-    const resumeEducations = await generateResumeEducations(generativeModel, jobDataString, educations);
-    resume.setEducations(resumeEducations);
-    // Experiences
-    const resumeExperiences = await generateResumeExperiences(generativeModel, jobDataString, experiences);
-    resume.setExperiences(resumeExperiences);
+    let resume = undefined;
+    try {
+      resume = await aiService.generateResume(user, skills, experiences, educations, jobData);
+    }
+    catch(err) {
+      if (err.message.includes('429') || err.message.includes('Quota exceeded')) {
+        return res
+          .status(HttpStatusCode.TooManyRequests)
+          .json(new ApiResponse(HttpStatusCode.TooManyRequests, "Too many requests received in one minute for this model. Please try again later or choose a different model."));
+      }
+      return next(err);
+    }
+    const type = Object.values(ResumeTypes).includes(req.query.type) ? req.query.type : ResumeTypes.Basic
     // Creating the resume as a docx file
-    const buffer = await generateResumeBasic(resume);
+    const buffer = await generateResumeBasic(resume, type);
     // Deducting the cost of generating a resume from the user's balance
     await deductAICost(userId, model);
     // Returning the generated resume as a docx file over Express

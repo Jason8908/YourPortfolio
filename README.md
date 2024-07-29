@@ -11,9 +11,9 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
 ## Brief description of the web application
 
-- Users can create an account and submit their skills, intrests, experience and desired job prospects.
+- Users can create an account and submit their skills, interests, past experience, and previous education.
 
-- YourPortfolio will find jobs with matching your portfolio, and generate catered resumes and cover letters for the specific job.
+- YourPortfolio will act as a job search portal for the user, and generate catered resumes and cover letters for the specific jobs selected.
 
 ## Bullet points outlining how to fulfil "Required Elements"
 
@@ -27,9 +27,9 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
 - The web app will be deployed as a website to the general public.
 
-- We will be using the ChatGPT API to generate resumes and cover letters.
+- We will be using the Google Gemini API to generate resumes and cover letters.
 
-- The Google Jobs page will be web-scraped in order to provide the user with relevant job posting suggestions.
+- The Indeed Jobs page will be web-scraped in order to provide the user with relevant job posting suggestions.
 
 - Users can log in and authentication will be done using OAuth 2.0 through Google accounts.
 
@@ -61,8 +61,6 @@ Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 ### Final version
 
 - Website has a landing page to explain the website
-- Users can choose between multiple generated resumes/cover letters
 - Users can choose between multiple formats for resumes and cover letter
 - Final stylistic updates are made to make the website look nice
-- Users can create job alerts that will send periodic emails to them with relevant jobs
 - Website is deployed

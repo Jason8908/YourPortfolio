@@ -223,6 +223,7 @@ export class ApiService {
   generateCoverLetter(
     jobData: JobData,
     selectedAIModel: string = AIModels.Gemini15Flash,
+    selectedTemplate: string = 'brown',
   ): Observable<any> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.post(
@@ -238,6 +239,7 @@ export class ApiService {
         },
         params: {
           model: selectedAIModel,
+          type: selectedTemplate,
         },
         responseType: 'arraybuffer',
       },
@@ -247,6 +249,7 @@ export class ApiService {
   generateResume(
     jobData: JobData,
     selectedAIModel: string = AIModels.Gemini15Flash,
+    selectedTemplate: string = 'resume-basic',
   ): Observable<any> {
     const token = this.cookieService.get(CookieLabels.AUTH_TOKEN);
     return this.http.post(
@@ -262,6 +265,7 @@ export class ApiService {
         },
         params: {
           model: selectedAIModel,
+          type: selectedTemplate
         },
         responseType: 'arraybuffer',
       },

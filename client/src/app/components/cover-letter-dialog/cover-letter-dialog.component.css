@@ -1,3 +1,58 @@
 h3 {
   font-size: 1.2em;
 }
+
+.template-select-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+
+.template-option:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+.template-option-selected {
+  border-color: #00fbde;
+}
+
+.tempalte-option:not(.template-option-selected) {
+  border-color: rgb(95, 95, 95);
+}
+
+.template-option {
+  background-color: white;
+  min-width: 300px;
+  min-height: 400px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 2px;
+  padding: 2%;
+  transition-property: transform;
+  transition-duration: 100ms;
+}
+
+.resume-template-1 {
+  background-image: url('../../../assets/sample-resume.png');
+}
+.resume-template-2 {
+  background-image: url('../../../assets/sample-resume-2.png');
+}
+.resume-template-3 {
+  background-image: url('../../../assets/sample-resume-3.png');
+}
+
+.cover-letter-template-1 {
+  background-image: url('../../../assets/sample-cv-brown.png');
+}
+.cover-letter-template-2 {
+  background-image: url('../../../assets/sample-cv-white.png');
+}
+.cover-letter-template-3 {
+  background-image: url('../../../assets/sample-cv-blue.png');
+}
