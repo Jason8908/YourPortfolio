@@ -7,6 +7,7 @@ import { Op } from "sequelize";
 import { HttpStatusCode } from "axios";
 import { ApiResponse } from "../entities/response.js";
 import { User } from "../models/users.js";
+import { City } from "../models/cities.js";
 
 export const jobsRouter = Router();
 
@@ -133,4 +134,22 @@ jobsRouter.get("/saved", isAuthenticated, setUserId, async (req, res) => {
   const jobs = results.rows;
 
   return res.status(200).json(new ApiResponse(200, "", { totalCount, jobs }));
+});
+
+jobsRouter.get("/city", isAuthenticated, async (req, res) => {
+  const limit = req.query.limit || 10;
+  const offset = req.query.offset || 0;
+  const search = req.query.search || "";
+
+  if (search == "") return res.status(200).json(new ApiResponse(200, "", { count: 0, cities: [] }));
+
+  const results = await City.findAndCountAll({
+    where: { city: { [Op.iLike]: `%${search}%` } },
+    limit: limit,
+    offset: offset,
+  });
+
+  const count = results.count;
+  const cities = results.rows.map(q => q.city);
+  res.status(200).json(new ApiResponse(200, "", { count, cities }));
 });
