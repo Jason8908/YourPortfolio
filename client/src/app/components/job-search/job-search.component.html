@@ -2,12 +2,17 @@
   <div class="form-fields">
     <mat-form-field>
       <mat-label class="apercu-font">Job Query</mat-label>
-      <input matInput formControlName="query" [required]="true" style="color: white"/>
+      <input matInput formControlName="query" [required]="true" style="color: white" />
     </mat-form-field>
     <mat-form-field>
       <mat-label class="apercu-font">Location</mat-label>
-      <input matInput formControlName="location" [required]="true" style="color: white"/>
+      <input matInput formControlName="location" [required]="true" [matAutocomplete]="auto" style="color: white" />
     </mat-form-field>
+    <mat-autocomplete #auto="matAutocomplete">
+      @for (city of cities; track city) {
+      <mat-option [value]="city">{{city}}</mat-option>
+      }
+    </mat-autocomplete>
     <div class="button-container">
       <button type="submit" class="apercu-font yourport-button" [disabled]="!canSubmit">Search</button>
     </div>

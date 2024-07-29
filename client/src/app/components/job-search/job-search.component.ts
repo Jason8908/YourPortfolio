@@ -10,6 +10,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 import { JobSearchRequest } from '../../classes/jobSearch';
 import { query } from '@angular/animations';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { CommonModule } from '@angular/common';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-job-search',
@@ -20,12 +23,19 @@ import { query } from '@angular/animations';
     FormsModule,
     MatInputModule,
     MatButton,
+    MatAutocompleteModule,
+    CommonModule,
   ],
   templateUrl: './job-search.component.html',
   styleUrl: './job-search.component.css',
 })
 export class JobSearchComponent {
-  canSubmit:boolean = false;
+  canSubmit: boolean = false;
+  currLocation = '';
+  cities = [];
+  apiDelay = 350;
+  currTimeout: any = null;
+
   @Input() formValues = {
     query: undefined,
     location: undefined,
@@ -33,7 +43,7 @@ export class JobSearchComponent {
   @Output() newSearch = new EventEmitter<JobSearchRequest>();
 
   jobSearch: FormGroup;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private apiService: ApiService) {
     this.jobSearch = this.fb.group({
       query: [''],
       location: [''],
@@ -53,7 +63,30 @@ export class JobSearchComponent {
     }
 
     this.jobSearch.valueChanges.subscribe(() => {
-      this.canSubmit = this.jobSearch.value.query && this.jobSearch.value.location;
+      this.canSubmit =
+        this.jobSearch.value.query && this.jobSearch.value.location;
+
+      //Check if location value changed
+      if (this.currLocation != this.jobSearch.value.location) {
+        this.currLocation = this.jobSearch.value.location;
+        this.currTimeout && clearTimeout(this.currTimeout);
+        this.currTimeout = setTimeout(() => {
+          this.updateCities();
+        }, this.apiDelay);
+      }
+    });
+  }
+
+  updateCities() {
+    if (this.currLocation == '') {
+      this.cities = [];
+      return;
+    }
+    console.log(this.currLocation);
+    this.apiService.getCities(this.currLocation, 0, 5).subscribe({
+      next: (res) => {
+        this.cities = res.data.cities;
+      },
     });
   }
 }
