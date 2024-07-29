@@ -14,17 +14,6 @@ skillsRouter.get("/", isAuthenticated, async (req, res) => {
   const offset = req.query.offset || 0;
   const search = req.query.search || "";
 
-  // Search for skills that are similar to the search term
-  // const results = await Skill.findAndCountAll({
-  //   where: { skillName: { [Op.iLike]: `%${search}%` } },
-  //   limit: limit,
-  //   offset: offset,
-  //   order: [
-  //     [Sequelize.fn("LENGTH", Sequelize.col("skillName")), "ASC"],
-  //     ["skillName", "ASC"],
-  //   ],
-  // });
-
   const results = await Skill.findAndCountAll({
     where: { skillName: { [Op.iLike]: `%${search}%` } },
     limit: limit,
