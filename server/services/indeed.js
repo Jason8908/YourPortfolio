@@ -12,12 +12,14 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
 
   try {
 
+    const apiKeyInd = Math.floor(Math.random() * API_KEYS.length);
+
     const options = {
       "method": "post",
       "responseType": "json",
       "url": "https://api.wintr.com/fetch",
       "data": {
-        "apikey": API_KEYS[0],
+        "apikey": API_KEYS[apiKeyInd],
         "method": "GET",
         "url": `https://ca.indeed.com/jobs?from=searchOnHP&q=${encodedQuery}&l=${encodedLocation}${pageParam}&spa=1`,
         "jsrender": true,
@@ -51,9 +53,11 @@ async function getIndeedJobsIds({ jobQuery, jobLocation, page }) {
 
 async function getIndeedJobsv2({ ids }) {
 
+  const start = Math.floor(Math.random() * API_KEYS.length);
+
   try {
     const jobs = await Promise.all(
-      ids.map(async (id, ind) => await getIndeedJobFromIdv2({ id, ind })),
+      ids.map(async (id, ind) => await getIndeedJobFromIdv2({ id, ind: ind + start })),
     );
 
     let allAttributesSet = jobs.reduce(
