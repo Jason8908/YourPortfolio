@@ -4,6 +4,11 @@
 
 Our team name is Wenduo Sky Chop Chop, and the project title is YourPortfolio.
 
+## Project URLs
+
+- Application URL: https://yourport.tech
+- Video URL: https://youtu.be/3N4g8nXutdE
+
 ## Team members with @mail.utoronto.ca emails
 
 - miles.bernstein@mail.utoronto.ca
