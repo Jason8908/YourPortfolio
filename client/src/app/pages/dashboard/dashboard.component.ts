@@ -7,7 +7,6 @@ import { LocalStorageService } from '../../services/local-storage.service';
 import { JobSearchComponent } from '../../components/job-search/job-search.component';
 import { MatCardModule } from '@angular/material/card';
 import { JobSearchRequest } from '../../classes/jobSearch';
-import { query } from '@angular/animations';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,8 +16,8 @@ import { query } from '@angular/animations';
     UserSkillsComponent,
     RouterModule,
     JobSearchComponent,
-    MatCardModule,
-  ],
+    MatCardModule
+],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })

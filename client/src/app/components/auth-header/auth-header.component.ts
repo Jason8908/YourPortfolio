@@ -10,6 +10,7 @@ import { User } from '../../classes/user';
 import { CookieLabels } from '../../app.constants';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ProfileNoticeComponent } from "../profile-notice/profile-notice.component";
 
 @Component({
   selector: 'app-auth-header',
@@ -20,7 +21,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatIconModule,
     MatMenuModule,
     RouterModule,
-  ],
+    ProfileNoticeComponent
+],
   templateUrl: './auth-header.component.html',
   styleUrl: './auth-header.component.css',
 })

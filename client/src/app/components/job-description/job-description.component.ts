@@ -76,6 +76,10 @@ export class JobDescriptionComponent {
           this.snackbar.open(`Received too many requests in one minute for this model. Please try again later or choose a different model.`, 'OK');
           return;
         }
+        else if (err.status === 400) {
+          this.snackbar.open(`A completed profile is required for cover letter generation.`, 'OK');
+          return;
+        }
         this.snackbar.open(`Error generating cover letter.`, 'OK');
       });
   }
@@ -106,6 +110,14 @@ export class JobDescriptionComponent {
         this.loading = false;
         if (err.status === 429) {
           this.snackbar.open(`Received too many requests in one minute for this model. Please try again later or choose a different model.`, 'OK');
+          return;
+        }
+        else if (err.status === 400) {
+          this.snackbar.open(`A completed profile is required for cover letter generation.`, 'OK');
+          return;
+        }
+        else if (err.status === 401) {
+          this.snackbar.open(`You need to purchase credits to generate a resume.`, 'OK');
           return;
         }
         this.snackbar.open(`Error generating resume.`, 'OK');
