@@ -48,6 +48,9 @@ export class JobDescriptionComponent {
   @Output() onAIReturn = new EventEmitter<void>();
   loading: boolean = false;
   constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
+  redirctToJob(url: string) {
+    window.open(url, '_blank');
+  }
   generateCoverLetter(jobData: JobData, selectedAIModel: string | undefined, selectedTemplate: string | undefined) {
     this.loading = true;
     this.apiService
@@ -113,7 +116,7 @@ export class JobDescriptionComponent {
           return;
         }
         else if (err.status === 400) {
-          this.snackbar.open(`A completed profile is required for cover letter generation.`, 'OK');
+          this.snackbar.open(`A completed profile is required for resume generation.`, 'OK');
           return;
         }
         else if (err.status === 401) {

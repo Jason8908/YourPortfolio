@@ -9,6 +9,10 @@
   </mat-card-header>
   <br />
   <mat-card-actions class="job-buttons">
+    <button mat-flat-button (click)="redirctToJob(jobData.link)">
+      <mat-icon>open_in_new</mat-icon>
+      Apply
+    </button>
     <button
       color="accent"
       *ngIf="!jobData.saved; else showUnsave"
